@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CalendarView
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 
 class HomeFragment : Fragment() {
 
@@ -21,6 +23,16 @@ class HomeFragment : Fragment() {
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
             val date = "$dayOfMonth/${month + 1}/$year"
             Toast.makeText(requireContext(), "Selected date: $date", Toast.LENGTH_SHORT).show()
+        }
+
+        // 설정 버튼 클릭 시 SettingsFragment로 전환
+        val settingsButton = view.findViewById<ImageButton>(R.id.settings_button)
+        settingsButton.setOnClickListener {
+            val settingsFragment = SettingsFragment()
+            val transaction: FragmentTransaction = parentFragmentManager.beginTransaction()
+            transaction.replace(R.id.fragment_container, settingsFragment)
+            transaction.addToBackStack(null)
+            transaction.commit()
         }
 
         return view
