@@ -23,9 +23,6 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_map -> {
                     selectedFragment = MapFragment()
                 }
-                R.id.nav_exercise -> {
-                    selectedFragment = ExerciseFragment()
-                }
                 R.id.nav_calendar -> {
                     selectedFragment = CalendarFragment()
                 }
