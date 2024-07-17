@@ -41,6 +41,7 @@ class LoginActivity : AppCompatActivity() {
 
         kakaoLoginButton.setOnClickListener {
             // 카카오톡 로그인 로직 추가
+            //ㅇㅋㅇㅋ
         }
 
         naverLoginButton.setOnClickListener {
