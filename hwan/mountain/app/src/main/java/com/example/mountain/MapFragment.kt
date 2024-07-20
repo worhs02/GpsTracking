@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.naver.maps.map.MapView
 import com.naver.maps.map.OnMapReadyCallback
@@ -14,6 +17,9 @@ import com.naver.maps.geometry.LatLng
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mapView: MapView
+    private lateinit var startButton: Button
+    private lateinit var overlayInfo: LinearLayout
+    private lateinit var exerciseTime: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,6 +34,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView = view.findViewById(R.id.map_view)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+
+        startButton = view.findViewById(R.id.start_button)
+        overlayInfo = view.findViewById(R.id.overlay_info)
+        exerciseTime = view.findViewById(R.id.exercise_time)
+
+        startButton.setOnClickListener {
+            if (startButton.text == "등산 시작") {
+                startButton.text = "등산 종료"
+                // 등산 시작 로직 추가
+            } else {
+                startButton.text = "등산 시작"
+                overlayInfo.visibility = View.VISIBLE
+                // 운동 시간 및 기타 정보 업데이트 로직 추가
+            }
+        }
     }
 
     override fun onMapReady(naverMap: NaverMap) {
