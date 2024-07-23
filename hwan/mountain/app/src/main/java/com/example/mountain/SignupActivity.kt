@@ -102,6 +102,8 @@ class SignupActivity : AppCompatActivity() {
                 updateProgress(4) // Final step completion
             }
         }
+        
+
     }
 
     private var currentStep = 1
@@ -132,8 +134,9 @@ class SignupActivity : AppCompatActivity() {
                 etUsername.visibility = View.GONE
                 btnSignup.visibility = View.GONE
                 etPassword.requestFocus()
-                EmailText1.visibility = View.GONE
-                EmailText2.visibility = View.GONE
+//                EmailText1.visibility = View.GONE
+                EmailText1.alpha = 0.2f
+                EmailText2.alpha = 0.2f
                 PWText1.visibility = View.VISIBLE
                 PWText2.visibility = View.VISIBLE
             }
@@ -145,8 +148,8 @@ class SignupActivity : AppCompatActivity() {
                 btnNext.visibility = View.VISIBLE
                 btnSignup.visibility = View.GONE
                 etConfirmPassword.requestFocus()
-                PWText1.visibility = View.GONE
-                PWText2.visibility = View.GONE
+                PWText1.alpha = 0.2f
+                PWText2.alpha = 0.2f
                 RePWText1.visibility = View.VISIBLE
                 RePWText2.visibility = View.VISIBLE
             }
@@ -158,8 +161,8 @@ class SignupActivity : AppCompatActivity() {
                 btnNext.visibility = View.GONE
                 btnSignup.visibility = View.VISIBLE
                 etUsername.requestFocus()
-                RePWText1.visibility = View.GONE
-                RePWText2.visibility = View.GONE
+                RePWText1.alpha = 0.2f
+                RePWText2.alpha = 0.2f
                 NicknameText1.visibility = View.VISIBLE
                 NicknameText2.visibility = View.VISIBLE
 
