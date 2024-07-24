@@ -1,16 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="calendar"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_centerVertical="true"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Overlay View -->
+    <RelativeLayout
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="@android:color/transparent"
+        android:padding="16dp">
+
+        <!-- Overlay Background -->
+        <RelativeLayout
+            android:id="@+id/overlayContent"
+            android:layout_width="200dp"
+            android:layout_height="350dp"
+            android:background="@drawable/overlay_background"
+            android:padding="16dp"
+            android:layout_centerInParent="true">
+
+            <TextView
+                android:id="@+id/selectedDateTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Selected Date"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"/>
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>
