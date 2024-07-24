@@ -36,6 +36,11 @@ class LoginActivity : AppCompatActivity() {
                 finish()
             } else {
                 Toast.makeText(this, "이메일 또는 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show()
+
+                //화면 넘어가기 위한 임시 코드
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
             }
         }
 
