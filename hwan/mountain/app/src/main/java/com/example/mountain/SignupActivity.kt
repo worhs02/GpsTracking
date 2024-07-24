@@ -1,172 +1,183 @@
 package com.example.mountain
 
-import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
-import android.provider.ContactsContract.CommonDataKinds.Nickname
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.LinearLayout
+import android.widget.ImageButton
 import android.widget.ProgressBar
-import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
+import com.example.mountain.signUpFragment.EmailFragment
+import com.example.mountain.signUpFragment.PasswordFragment
+import com.example.mountain.signUpFragment.UsernameFragment
 
 class SignupActivity : AppCompatActivity() {
 
-    private lateinit var etEmail: EditText
-    private lateinit var etPassword: EditText
-    private lateinit var etConfirmPassword: EditText
-    private lateinit var etUsername: EditText
-    private lateinit var btnSignup: Button
     private lateinit var btnNext: Button
-    private lateinit var progressBar: ProgressBar
-    private lateinit var progressLayout: ConstraintLayout
-    private lateinit var EmailText1: TextView
-    private lateinit var EmailText2: TextView
-    private lateinit var PWText1: TextView
-    private lateinit var PWText2: TextView
-    private lateinit var RePWText1: TextView
-    private lateinit var RePWText2: TextView
-    private lateinit var NicknameText1: TextView
-    private lateinit var NicknameText2: TextView
+    private lateinit var btnSignup: Button
+    private var currentStep = 1
+    private  lateinit var backButton:ImageButton
 
-    @SuppressLint("MissingInflatedId")
+    private lateinit var dot1: TextView
+    private lateinit var dot2: TextView
+    private lateinit var dot3: TextView
+    private lateinit var dot4: TextView
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup)
 
-        etEmail = findViewById(R.id.etEmail)
-        etPassword = findViewById(R.id.etPassword)
-        etConfirmPassword = findViewById(R.id.etConfirmPassword)
-        etUsername = findViewById(R.id.etUsername)
-        btnSignup = findViewById(R.id.btnSignup)
+        // Initialize views
         btnNext = findViewById(R.id.btnNext)
-        progressBar = findViewById(R.id.progressBar)
-        EmailText1 = findViewById(R.id.textViewEmailPrompt1)
-        EmailText2 = findViewById(R.id.textViewEmailPrompt2)
-        PWText1 = findViewById(R.id.textViewPwPrompt1)
-        PWText2 = findViewById(R.id.textViewPwPrompt2)
-        RePWText1 = findViewById(R.id.textViewRePwPrompt1)
-        RePWText2 = findViewById(R.id.textViewRePwPrompt2)
-        NicknameText1 = findViewById(R.id.textViewNamePrompt1)
-        NicknameText2 = findViewById(R.id.textViewNamePrompt2)
+        btnSignup = findViewById(R.id.btnSignup)
+        backButton = findViewById(R.id.back_button)
 
-        updateProgress(1) // Initially set to step 1
+        dot1 = findViewById(R.id.dot1)
+        dot2 = findViewById(R.id.dot2)
+        dot3 = findViewById(R.id.dot3)
+        dot4 = findViewById(R.id.dot4)
+
+
+
+        // Show the initial fragment
+        showFragment(EmailFragment())
 
         btnNext.setOnClickListener {
             when (currentStep) {
                 1 -> {
-                    if (etEmail.text.toString().isNotEmpty()) {
+                    val emailFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as? EmailFragment
+                    if (emailFragment?.getEmail()?.isNotEmpty() == true) {
+                        // 이메일 인증 메소드 보내기
+                        emailFragment.changeVerifyState()
                         updateProgress(2)
                     } else {
-                        Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "이메일을 입력해주세요.", Toast.LENGTH_SHORT).show()
                     }
                 }
                 2 -> {
-                    if (etPassword.text.toString().isNotEmpty()) {
-                        etConfirmPassword.visibility = View.VISIBLE
-                        etConfirmPassword.requestFocus()
+                    val emailFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as? EmailFragment
+                    if (emailFragment?.getVerificationCode()?.isNotEmpty() == true) { // 확인코드 확인
+                        showFragment(PasswordFragment()) // This seems redundant; you might need to handle differently
                         updateProgress(3)
                     } else {
-                        Toast.makeText(this, "Please enter your password", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "인증 코드가 틀렸습니다.", Toast.LENGTH_SHORT).show()
                     }
                 }
                 3 -> {
-                    if (etConfirmPassword.text.toString().isNotEmpty()) {
-                        etUsername.visibility = View.VISIBLE
-                        etUsername.requestFocus()
-                        updateProgress(4)
+                    val passwordFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as? PasswordFragment
+                    val password = passwordFragment?.getPassword()
+                    val confirmPassword = passwordFragment?.getConfirmPassword()
+
+                    if (!password.isNullOrEmpty() && !confirmPassword.isNullOrEmpty()) {
+                        if (password == confirmPassword) {
+                            showFragment(UsernameFragment())
+                            updateProgress(4)
+                        } else {
+                            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                        }
                     } else {
-                        Toast.makeText(this, "Please confirm your password", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Please enter and confirm your password", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
         }
 
         btnSignup.setOnClickListener {
-            val email = etEmail.text.toString()
-            val password = etPassword.text.toString()
-            val confirmPassword = etConfirmPassword.text.toString()
-            val username = etUsername.text.toString()
+            val usernameFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as? UsernameFragment
+            val emailFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as? EmailFragment
+            val passwordFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as? PasswordFragment
 
-            if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || username.isEmpty()) {
+            val email = emailFragment?.getEmail() ?: ""
+            val password = passwordFragment?.getPassword() ?: ""
+            val confirmPassword = passwordFragment?.getConfirmPassword() ?: ""
+            val username = usernameFragment?.getUsername() ?: ""
+
+            if (username.isEmpty()) {
                 Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show()
-            } else if (password != confirmPassword) {
-                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
             } else {
-                // Here, you can add code to handle the signup logic, such as sending the data to a server
+                // Handle signup logic here
                 Toast.makeText(this, "Signup successful", Toast.LENGTH_SHORT).show()
-                updateProgress(4) // Final step completion
+                updateProgress(5) // Assuming 5 is the final step
             }
         }
-        
+        backButton.setOnClickListener{
+            when (currentStep) {
+                1 -> {
+                    val intent = Intent(this, LoginActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+                2 -> {
+                    val emailFragment = EmailFragment()
+                    showFragment(emailFragment)
+                    updateProgress(1)
+                }
+                3 -> {
+                    val emailFragment = EmailFragment()
+                    showFragment(emailFragment)
+                    updateProgress(2)
+                }
+                4 -> {
+                    val passwordFragment = PasswordFragment()
+                    showFragment(passwordFragment)
+                    updateProgress(3)
+                }
+            }
+        }
 
     }
 
-    private var currentStep = 1
+    private fun showFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
+    }
 
-    private fun updateProgress(step: Int) {
+    fun updateProgress(step: Int) {
         currentStep = step
-        progressBar.progress = step
+        updateDots(step)
+
 
         when (step) {
             1 -> {
-                etEmail.visibility = View.VISIBLE
-                etPassword.visibility = View.GONE
-                etConfirmPassword.visibility = View.GONE
-                etUsername.visibility = View.GONE
+                btnNext.text = "인증하기"
                 btnNext.visibility = View.VISIBLE
                 btnSignup.visibility = View.GONE
-                PWText1.visibility = View.GONE
-                PWText2.visibility = View.GONE
-                RePWText1.visibility = View.GONE
-                RePWText2.visibility = View.GONE
-                NicknameText1.visibility = View.GONE
-                NicknameText2.visibility = View.GONE
             }
             2 -> {
-                etEmail.visibility = View.VISIBLE
-                etPassword.visibility = View.VISIBLE
-                etConfirmPassword.visibility = View.GONE
-                etUsername.visibility = View.GONE
-                btnSignup.visibility = View.GONE
-                etPassword.requestFocus()
-//                EmailText1.visibility = View.GONE
-                EmailText1.alpha = 0.2f
-                EmailText2.alpha = 0.2f
-                PWText1.visibility = View.VISIBLE
-                PWText2.visibility = View.VISIBLE
-            }
-            3 -> {
-                etEmail.visibility = View.VISIBLE
-                etPassword.visibility = View.VISIBLE
-                etConfirmPassword.visibility = View.VISIBLE
-                etUsername.visibility = View.GONE
+                btnNext.text = "인증 코드 확인"
                 btnNext.visibility = View.VISIBLE
                 btnSignup.visibility = View.GONE
-                etConfirmPassword.requestFocus()
-                PWText1.alpha = 0.2f
-                PWText2.alpha = 0.2f
-                RePWText1.visibility = View.VISIBLE
-                RePWText2.visibility = View.VISIBLE
+            }
+            3 -> {
+                btnNext.text = "다음"
+                btnNext.visibility = View.VISIBLE
+                btnSignup.visibility = View.GONE
             }
             4 -> {
-                etEmail.visibility = View.VISIBLE
-                etPassword.visibility = View.VISIBLE
-                etConfirmPassword.visibility = View.VISIBLE
-                etUsername.visibility = View.VISIBLE
+                btnNext.text = "다음"
                 btnNext.visibility = View.GONE
                 btnSignup.visibility = View.VISIBLE
-                etUsername.requestFocus()
-                RePWText1.alpha = 0.2f
-                RePWText2.alpha = 0.2f
-                NicknameText1.visibility = View.VISIBLE
-                NicknameText2.visibility = View.VISIBLE
-
+            }
+            5 -> {
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+                finish()
             }
         }
+    }
+    private fun updateDots(step: Int) {
+        val activeDrawable = R.drawable.dot_active
+        val inactiveDrawable = R.drawable.dot_inactive
+
+        dot1.setBackgroundResource(if (step >= 1) activeDrawable else inactiveDrawable)
+        dot2.setBackgroundResource(if (step >= 2) activeDrawable else inactiveDrawable)
+        dot3.setBackgroundResource(if (step >= 3) activeDrawable else inactiveDrawable)
+        dot4.setBackgroundResource(if (step >= 4) activeDrawable else inactiveDrawable)
     }
 }
