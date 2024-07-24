@@ -48,11 +48,8 @@ class SignupActivity : AppCompatActivity() {
         EmailText1 = findViewById(R.id.textViewEmailPrompt1)
         EmailText2 = findViewById(R.id.textViewEmailPrompt2)
         PWText1 = findViewById(R.id.textViewPwPrompt1)
-        PWText2 = findViewById(R.id.textViewPwPrompt2)
         RePWText1 = findViewById(R.id.textViewRePwPrompt1)
-        RePWText2 = findViewById(R.id.textViewRePwPrompt2)
         NicknameText1 = findViewById(R.id.textViewNamePrompt1)
-        NicknameText2 = findViewById(R.id.textViewNamePrompt2)
 
         updateProgress(1) // Initially set to step 1
 
@@ -121,11 +118,9 @@ class SignupActivity : AppCompatActivity() {
                 btnNext.visibility = View.VISIBLE
                 btnSignup.visibility = View.GONE
                 PWText1.visibility = View.GONE
-                PWText2.visibility = View.GONE
                 RePWText1.visibility = View.GONE
-                RePWText2.visibility = View.GONE
                 NicknameText1.visibility = View.GONE
-                NicknameText2.visibility = View.GONE
+
             }
             2 -> {
                 etEmail.visibility = View.VISIBLE
@@ -133,12 +128,23 @@ class SignupActivity : AppCompatActivity() {
                 etConfirmPassword.visibility = View.GONE
                 etUsername.visibility = View.GONE
                 btnSignup.visibility = View.GONE
-                etPassword.requestFocus()
-//                EmailText1.visibility = View.GONE
+//                etPassword.requestFocus()
+                EmailText1.animate()
+                    .alpha(0f) // 투명도를 0으로 변경
+                    .setDuration(1000) // 애니메이션 지속 시간 (1000 밀리초 = 1초)
+                    .withEndAction {
+                        EmailText1.visibility = View.GONE // 애니메이션이 끝난 후 visibility를 GONE으로 설정
+                    }
+                EmailText2.animate()
+                    .alpha(0f) // 투명도를 0으로 변경
+                    .setDuration(1000) // 애니메이션 지속 시간 (1000 밀리초 = 1초)
+                    .withEndAction {
+                        EmailText2.visibility = View.GONE // 애니메이션이 끝난 후 visibility를 GONE으로 설정
+                    }
+
                 EmailText1.alpha = 0.2f
                 EmailText2.alpha = 0.2f
                 PWText1.visibility = View.VISIBLE
-                PWText2.visibility = View.VISIBLE
             }
             3 -> {
                 etEmail.visibility = View.VISIBLE
@@ -149,9 +155,7 @@ class SignupActivity : AppCompatActivity() {
                 btnSignup.visibility = View.GONE
                 etConfirmPassword.requestFocus()
                 PWText1.alpha = 0.2f
-                PWText2.alpha = 0.2f
                 RePWText1.visibility = View.VISIBLE
-                RePWText2.visibility = View.VISIBLE
             }
             4 -> {
                 etEmail.visibility = View.VISIBLE
@@ -162,9 +166,8 @@ class SignupActivity : AppCompatActivity() {
                 btnSignup.visibility = View.VISIBLE
                 etUsername.requestFocus()
                 RePWText1.alpha = 0.2f
-                RePWText2.alpha = 0.2f
                 NicknameText1.visibility = View.VISIBLE
-                NicknameText2.visibility = View.VISIBLE
+
 
             }
         }
