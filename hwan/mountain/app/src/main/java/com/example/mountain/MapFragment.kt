@@ -52,9 +52,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(naverMap: NaverMap) {
-        // 네이버 지도가 준비되면 기본 위치를 서울로 설정
-        val seoul = LatLng(37.5665, 126.9780)
-        naverMap.moveCamera(CameraUpdate.scrollTo(seoul))
+        // 청계산 입구로 기본 위치 설정
+        val cheonggyeMountainEntrance = LatLng(37.4483, 127.0565)
+        naverMap.moveCamera(CameraUpdate.scrollTo(cheonggyeMountainEntrance))
+
+        // 현재 위치를 파란색 점으로 표시
+        val locationOverlay = naverMap.locationOverlay
+        locationOverlay.isVisible = true
+        locationOverlay.position = cheonggyeMountainEntrance
+        locationOverlay.bearing = 0F
     }
 
     override fun onStart() {
