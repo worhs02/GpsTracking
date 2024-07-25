@@ -1,22 +1,30 @@
 package com.example.mountain
 
+import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
 import java.util.*
 
-class CalendarAdapter(private val onDateClickListener: (Date, View) -> Unit) : RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder>() {
+class CalendarAdapter(
+    private val onDateClickListener: (Date, View) -> Unit,
+    private val holidays: Set<Date> // 공휴일 목록 추가
+) : RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder>() {
 
     private val days = mutableListOf<Date>()
     private val dateFormat = SimpleDateFormat("d", Locale.getDefault())
+    private lateinit var context: Context
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CalendarViewHolder {
-        val view = LayoutInflater.from(parent.context)
+        context = parent.context // Context 저장
+        val view = LayoutInflater.from(context)
             .inflate(R.layout.item_calendar_day, parent, false)
-        return CalendarViewHolder(view, onDateClickListener)
+        return CalendarViewHolder(view, onDateClickListener, holidays)
     }
 
     override fun onBindViewHolder(holder: CalendarViewHolder, position: Int) {
@@ -34,7 +42,11 @@ class CalendarAdapter(private val onDateClickListener: (Date, View) -> Unit) : R
         notifyDataSetChanged()
     }
 
-    class CalendarViewHolder(view: View, private val onDateClickListener: (Date, View) -> Unit) : RecyclerView.ViewHolder(view) {
+    class CalendarViewHolder(
+        view: View,
+        private val onDateClickListener: (Date, View) -> Unit,
+        private val holidays: Set<Date> // 공휴일 목록 추가
+    ) : RecyclerView.ViewHolder(view) {
         private val dayTextView: TextView = view.findViewById(R.id.dayTextView)
         private var currentDate: Date? = null
 
@@ -47,6 +59,22 @@ class CalendarAdapter(private val onDateClickListener: (Date, View) -> Unit) : R
         fun bind(date: Date, dateFormat: SimpleDateFormat) {
             currentDate = date
             dayTextView.text = dateFormat.format(date)
+
+            // 요일과 공휴일에 따라 색상 변경
+            val calendar = Calendar.getInstance()
+            calendar.time = date
+            val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+            val isHoliday = holidays.contains(date)
+
+            val lightRed = ContextCompat.getColor(dayTextView.context, R.color.light_red) // 연빨강
+            val lightBlue = ContextCompat.getColor(dayTextView.context, R.color.light_blue) // 연파랑
+
+            when {
+                isHoliday -> dayTextView.setTextColor(lightRed) // 공휴일 연빨강
+                dayOfWeek == Calendar.SUNDAY -> dayTextView.setTextColor(lightRed) // 일요일 연빨강
+                dayOfWeek == Calendar.SATURDAY -> dayTextView.setTextColor(lightBlue) // 토요일 연파랑
+                else -> dayTextView.setTextColor(Color.BLACK) // 평일 검정색
+            }
         }
     }
 }
