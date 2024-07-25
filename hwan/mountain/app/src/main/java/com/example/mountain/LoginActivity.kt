@@ -30,6 +30,9 @@ class LoginActivity : AppCompatActivity() {
             val password = passwordEditText.text.toString()
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "빈칸을 채워주세요.", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
             } else if (dbHelper.checkUser(email, password)) {
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)

@@ -1,42 +1,50 @@
-<?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_marginTop="60dp"
+    >
 
-    <CalendarView
-        android:id="@+id/calendarView"
+    <TextView
+        android:id="@+id/monthTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textSize="20sp"
+        android:layout_marginTop="16dp" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/calendarRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"/>
+        android:layout_below="@id/monthTextView"
+        android:layout_marginTop="16dp" />
 
-    <!-- Overlay View -->
     <RelativeLayout
         android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clickable="true"
         android:visibility="gone"
-        android:background="@android:color/transparent"
-        android:padding="16dp">
+        android:background="#30D3D3D3"
+        >
 
-        <!-- Overlay Background -->
         <RelativeLayout
             android:id="@+id/overlayContent"
-            android:layout_width="200dp"
-            android:layout_height="350dp"
+            android:layout_width="250dp"
+            android:layout_height="450dp"
+            android:layout_centerInParent="true"
             android:background="@drawable/overlay_background"
             android:padding="16dp"
-            android:layout_centerInParent="true">
+            >
 
             <TextView
                 android:id="@+id/selectedDateTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Selected Date"
-                android:textSize="18sp"
-                android:textColor="@android:color/black"/>
+                android:textSize="18sp" />
         </RelativeLayout>
-
     </RelativeLayout>
-
 </RelativeLayout>
