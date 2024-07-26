@@ -2,6 +2,7 @@ package com.example.mountain
 
 import android.content.Context
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ class CalendarAdapter(
     private val days = mutableListOf<Date>()
     private val dateFormat = SimpleDateFormat("d", Locale.getDefault())
     private lateinit var context: Context
+    private val dates = mutableListOf<Date>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CalendarViewHolder {
         context = parent.context // Context 저장
@@ -26,10 +28,18 @@ class CalendarAdapter(
             .inflate(R.layout.item_calendar_day, parent, false)
         return CalendarViewHolder(view, onDateClickListener, holidays)
     }
-
+    fun getDateAtPosition(position: Int): Date? {
+        return if (position in days.indices) {
+            days[position]
+        } else {
+            null
+        }
+    }
     override fun onBindViewHolder(holder: CalendarViewHolder, position: Int) {
         val date = days[position]
         holder.bind(date, dateFormat)
+
+
     }
 
     override fun getItemCount(): Int {
@@ -53,6 +63,7 @@ class CalendarAdapter(
         init {
             view.setOnClickListener {
                 currentDate?.let { date -> onDateClickListener(date, view) }
+                Log.d("CalendarAdapter", "Date clicked:)")
             }
         }
 

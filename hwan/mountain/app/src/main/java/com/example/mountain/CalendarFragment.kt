@@ -2,19 +2,14 @@ package com.example.mountain
 
 import android.graphics.Rect
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
+import android.util.Log
+import android.view.*
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.core.view.ViewCompat
-import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -37,6 +32,9 @@ class CalendarFragment : Fragment() {
     private val calendar = Calendar.getInstance()
     private var initialDate: Date? = null
 
+    private lateinit var gestureDetector: GestureDetector
+    private var isSwiping = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -57,7 +55,6 @@ class CalendarFragment : Fragment() {
         calendarRecyclerView.layoutManager = GridLayoutManager(context, 7)
         calendarRecyclerView.adapter = calendarAdapter
 
-        // 날짜 설정
         arguments?.getString("selectedDate")?.let { selectedDate ->
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale("ko", "KR"))
             initialDate = dateFormat.parse(selectedDate)
@@ -68,47 +65,135 @@ class CalendarFragment : Fragment() {
         overlay.setOnClickListener {
             hideOverlay()
         }
+
+        // GestureDetector 초기화
+        gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+            private val SWIPE_THRESHOLD = 5
+            private val SWIPE_VELOCITY_THRESHOLD = 5
+
+            override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+                isSwiping = true
+                return super.onScroll(e1, e2, distanceX, distanceY)
+            }
+
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                if (e1 != null) {
+                    val diffX = e2.x - e1.x
+                    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                        if (diffX > 0) {
+                            onSwipeRight()
+                        } else {
+                            onSwipeLeft()
+                        }
+                        isSwiping = false
+                        return true
+                    }
+                }
+                return false
+            }
+
+            override fun onSingleTapUp(e: MotionEvent): Boolean {
+                if (!isSwiping) {
+                    e?.let {
+                        val view = calendarRecyclerView.findChildViewUnder(it.x, it.y)
+                        view?.let { clickedView ->
+                            val position = calendarRecyclerView.getChildAdapterPosition(clickedView)
+                            Log.d("CalendarFragment", "Clicked position: $position")
+                            val date = calendarAdapter.getDateAtPosition(position)
+                            if (date != null) {
+                                showOverlay(date, clickedView)
+                                Log.d("CalendarFragment", "Date clicked: ${date.toDateString()}")
+                            } else {
+                                Log.e("CalendarFragment", "Date not found at position: $position")
+                            }
+                        }
+                    }
+                    return true
+                }
+                return false
+            }
+
+        })
+
+        view.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+            true
+        }
+
+        calendarRecyclerView.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)
+            true
+        }
+    }
+
+    private fun onSwipeRight() {
+        calendar.add(Calendar.MONTH, -1)
+        updateCalendar()
+    }
+
+    private fun onSwipeLeft() {
+        calendar.add(Calendar.MONTH, 1)
+        updateCalendar()
     }
 
     private fun updateCalendar() {
-        val dateFormat = SimpleDateFormat("MMMM yyyy", Locale("ko", "KR"))
+        val dateFormat = SimpleDateFormat("MMMM", Locale("ko", "KR"))
         monthTextView.text = dateFormat.format(calendar.time)
 
         updateWeekdayHeader()
 
         val days = mutableListOf<Date>()
         val tempCalendar = calendar.clone() as Calendar
+
         tempCalendar.set(Calendar.DAY_OF_MONTH, 1)
         val firstDayOfMonth = tempCalendar.get(Calendar.DAY_OF_WEEK) - 1
         tempCalendar.add(Calendar.DAY_OF_MONTH, -firstDayOfMonth)
 
-        for (i in 0..41) {
-            days.add(tempCalendar.time)
+        val lastDayOfMonth = calendar.clone() as Calendar
+        lastDayOfMonth.set(Calendar.DAY_OF_MONTH, lastDayOfMonth.getActualMaximum(Calendar.DAY_OF_MONTH))
+
+        val lastDayOfWeek = lastDayOfMonth.get(Calendar.DAY_OF_WEEK) - 1
+        val daysToStartOfLastWeek = -lastDayOfWeek
+        val startOfLastWeek = lastDayOfMonth.clone() as Calendar
+        startOfLastWeek.add(Calendar.DAY_OF_MONTH, daysToStartOfLastWeek)
+
+        val daysToAdd = Calendar.SATURDAY - lastDayOfMonth.get(Calendar.DAY_OF_WEEK)
+        val endOfLastWeek = lastDayOfMonth.clone() as Calendar
+        endOfLastWeek.add(Calendar.DAY_OF_MONTH, daysToAdd - 1)
+
+        while (true) {
+            val currentDay = tempCalendar.time
+            days.add(currentDay)
             tempCalendar.add(Calendar.DAY_OF_MONTH, 1)
+            if (currentDay.after(endOfLastWeek.time)) {
+                break
+            }
         }
 
         calendarAdapter.updateDays(days)
 
-        // RecyclerView 레이아웃이 완전히 준비된 후에 날짜를 스크롤하고 오버레이를 표시
-        calendarRecyclerView.viewTreeObserver.addOnGlobalLayoutListener(object :
-            ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                calendarRecyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+        calendarRecyclerView.post {
+            calendarRecyclerView.viewTreeObserver.addOnGlobalLayoutListener(object :
+                ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    calendarRecyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
 
-                initialDate?.let { date ->
-                    val position = days.indexOfFirst { it.toDateString() == date.toDateString() }
-                    if (position != -1) {
-                        calendarRecyclerView.layoutManager?.let { layoutManager ->
-                            layoutManager.scrollToPosition(position)
-                            calendarRecyclerView.post {
-                                showOverlay(date, calendarRecyclerView.getChildAt(position))
+                    initialDate?.let { date ->
+                        val position = days.indexOfFirst { it.toDateString() == date.toDateString() }
+                        if (position != -1) {
+                            calendarRecyclerView.layoutManager?.let { layoutManager ->
+                                layoutManager.scrollToPosition(position)
+                                calendarRecyclerView.post {
+                                    showOverlay(date, calendarRecyclerView.getChildAt(position))
+                                }
                             }
                         }
                     }
                 }
-            }
-        })
+            })
+        }
     }
+
 
     private fun Date.toDateString(): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale("ko", "KR"))
