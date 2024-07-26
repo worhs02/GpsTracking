@@ -28,6 +28,7 @@ class CalendarAdapter(
             .inflate(R.layout.item_calendar_day, parent, false)
         return CalendarViewHolder(view, onDateClickListener, holidays)
     }
+
     fun getDateAtPosition(position: Int): Date? {
         return if (position in days.indices) {
             days[position]
@@ -35,6 +36,7 @@ class CalendarAdapter(
             null
         }
     }
+
     override fun onBindViewHolder(holder: CalendarViewHolder, position: Int) {
         val date = days[position]
         holder.bind(date, dateFormat)
@@ -86,6 +88,13 @@ class CalendarAdapter(
                 dayOfWeek == Calendar.SATURDAY -> dayTextView.setTextColor(lightBlue) // 토요일 연파랑
                 else -> dayTextView.setTextColor(Color.BLACK) // 평일 검정색
             }
+            // 현재 월에 속하지 않는 날짜 투명도 조정
+            val currentCalendar = Calendar.getInstance()
+            currentCalendar.time = Date() // 현재 날짜
+            val isCurrentMonth = calendar.get(Calendar.MONTH) == currentCalendar.get(Calendar.MONTH)
+
+            dayTextView.alpha = if (isCurrentMonth) 1.0f else 0.4f // 현재 월인 경우 불투명, 아닌 경우 투명도 20%
         }
     }
 }
+
