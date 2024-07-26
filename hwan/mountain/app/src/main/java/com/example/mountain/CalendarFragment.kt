@@ -125,13 +125,37 @@ class CalendarFragment : Fragment() {
 
         val days = mutableListOf<Date>()
         val tempCalendar = calendar.clone() as Calendar
+
+        // 첫째 주 시작일 조정
         tempCalendar.set(Calendar.DAY_OF_MONTH, 1)
         val firstDayOfMonth = tempCalendar.get(Calendar.DAY_OF_WEEK) - 1
         tempCalendar.add(Calendar.DAY_OF_MONTH, -firstDayOfMonth)
 
-        for (i in 0..41) {
-            days.add(tempCalendar.time)
+        // 월의 마지막 날
+        val lastDayOfMonth = calendar.clone() as Calendar
+        lastDayOfMonth.set(Calendar.DAY_OF_MONTH, lastDayOfMonth.getActualMaximum(Calendar.DAY_OF_MONTH))
+
+        // 마지막 주의 시작일 조정
+        val lastDayOfWeek = lastDayOfMonth.get(Calendar.DAY_OF_WEEK) - 1
+        val daysToStartOfLastWeek = -lastDayOfWeek
+        val startOfLastWeek = lastDayOfMonth.clone() as Calendar
+        startOfLastWeek.add(Calendar.DAY_OF_MONTH, daysToStartOfLastWeek)
+
+        // 마지막 주의 토요일 구하기
+        val daysToAdd = Calendar.SATURDAY - lastDayOfMonth.get(Calendar.DAY_OF_WEEK)
+        val endOfLastWeek = lastDayOfMonth.clone() as Calendar
+        endOfLastWeek.add(Calendar.DAY_OF_MONTH, daysToAdd - 1)
+
+        // 날짜 추가
+        while (true) {
+            val currentDay = tempCalendar.time
+            days.add(currentDay)
             tempCalendar.add(Calendar.DAY_OF_MONTH, 1)
+
+            // 마지막 날 또는 마지막 주의 토요일까지 반복
+            if (currentDay.after(endOfLastWeek.time)) {
+                break
+            }
         }
 
         calendarAdapter.updateDays(days)
@@ -156,6 +180,8 @@ class CalendarFragment : Fragment() {
             }
         })
     }
+
+
 
     private fun Date.toDateString(): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale("ko", "KR"))
