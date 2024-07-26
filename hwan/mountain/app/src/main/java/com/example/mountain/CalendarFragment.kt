@@ -2,19 +2,14 @@ package com.example.mountain
 
 import android.graphics.Rect
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
+import android.util.Log
+import android.view.*
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.core.view.ViewCompat
-import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,6 +31,8 @@ class CalendarFragment : Fragment() {
     )
     private val calendar = Calendar.getInstance()
     private var initialDate: Date? = null
+
+    private lateinit var gestureDetector: GestureDetector
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,6 +65,56 @@ class CalendarFragment : Fragment() {
         overlay.setOnClickListener {
             hideOverlay()
         }
+
+        // GestureDetector 초기화
+        gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+            private val SWIPE_THRESHOLD = 1
+            private val SWIPE_VELOCITY_THRESHOLD = 1
+
+            override fun onFling(
+                e1: MotionEvent?,
+                e2: MotionEvent,
+                velocityX: Float,
+                velocityY: Float
+            ): Boolean {
+
+                if (e1 != null && e2 != null) {
+                    val diffX = e2.x - e1.x
+                    val diffY = e2.y - e1.y
+                    if (Math.abs(diffX) > Math.abs(diffY)) {
+                        if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                            if (diffX > 0) {
+                                onSwipeRight()
+                            } else {
+                                onSwipeLeft()
+                            }
+                            return true
+                        }
+                    }
+                }
+                return false
+            }
+        })
+
+        view.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)  // GestureDetector에 이벤트 전달
+            true  // 이벤트 처리 완료
+        }
+
+        calendarRecyclerView.setOnTouchListener { _, event ->
+            gestureDetector.onTouchEvent(event)  // GestureDetector에 이벤트 전달
+            true  // 이벤트 처리 완료
+        }
+    }
+
+    private fun onSwipeRight() {
+        calendar.add(Calendar.MONTH, -1)
+        updateCalendar()
+    }
+
+    private fun onSwipeLeft() {
+        calendar.add(Calendar.MONTH, 1)
+        updateCalendar()
     }
 
     private fun updateCalendar() {
