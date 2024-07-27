@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.naver.maps.map.MapView
@@ -18,7 +18,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mapView: MapView
     private lateinit var startButton: Button
-    private lateinit var overlayInfo: LinearLayout
+    private lateinit var overlayInfo: RelativeLayout
     private lateinit var exerciseTime: TextView
 
     override fun onCreateView(

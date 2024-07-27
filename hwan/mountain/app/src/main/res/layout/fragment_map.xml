@@ -18,29 +18,30 @@
         android:layout_margin="16dp"
         android:backgroundTint="@color/white" />
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/overlay_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:background="#80000000"
         android:padding="16dp"
-        android:visibility="gone"
-        android:layout_alignParentBottom="true">
+        android:layout_centerInParent="true"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/exercise_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#FFFFFF"
-            android:text="운동 시간: 00:00:00" />
+            android:text="운동 시간: 00:00:00"
+            android:layout_marginTop="16dp"/>
 
-        <!-- 다른 운동 정보 추가 -->
         <TextView
             android:id="@+id/other_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#FFFFFF"
-            android:text="기타 정보" />
-    </LinearLayout>
+            android:text="기타 정보"
+            android:layout_below="@id/exercise_time"
+            android:layout_marginTop="16dp"/>
+    </RelativeLayout>
 </RelativeLayout>
