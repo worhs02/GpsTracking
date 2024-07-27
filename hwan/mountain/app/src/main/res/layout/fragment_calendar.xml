@@ -1,42 +1,106 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:background="@color/Light_gray">
 
-    <CalendarView
-        android:id="@+id/calendarView"
+    <TextView
+        android:id="@+id/monthTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:padding="10dp"/>
+
+    <LinearLayout
+        android:id="@+id/weekdayHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"/>
+        android:layout_below="@id/monthTextView"
+        android:orientation="horizontal"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp">
 
-    <!-- Overlay View -->
+        <!-- 요일 텍스트들 추가 -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="일"
+            android:textAlignment="center" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="월"
+            android:textAlignment="center" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="화"
+            android:textAlignment="center" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="수"
+            android:textAlignment="center" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="목"
+            android:textAlignment="center" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="금"
+            android:textAlignment="center" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="토"
+            android:textAlignment="center" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/calendarRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/weekdayHeader"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:padding="2dp"
+        android:background="@drawable/calendar_background"/>
+
     <RelativeLayout
         android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clickable="true"
         android:visibility="gone"
-        android:background="@android:color/transparent"
-        android:padding="16dp">
+        android:background="#30D3D3D3">
 
-        <!-- Overlay Background -->
         <RelativeLayout
             android:id="@+id/overlayContent"
-            android:layout_width="200dp"
-            android:layout_height="350dp"
+            android:layout_width="250dp"
+            android:layout_height="450dp"
+            android:layout_centerInParent="true"
             android:background="@drawable/overlay_background"
-            android:padding="16dp"
-            android:layout_centerInParent="true">
+            android:padding="16dp">
 
             <TextView
                 android:id="@+id/selectedDateTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Selected Date"
-                android:textSize="18sp"
-                android:textColor="@android:color/black"/>
+                android:textSize="18sp"/>
         </RelativeLayout>
-
     </RelativeLayout>
-
 </RelativeLayout>

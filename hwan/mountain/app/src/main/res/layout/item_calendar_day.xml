@@ -1,0 +1,10 @@
+
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dayTextView"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:textSize="16sp"
+    android:background="?android:attr/selectableItemBackground"
+    android:gravity="center_horizontal"
+    android:color="@color/Light_gray"
+    />
