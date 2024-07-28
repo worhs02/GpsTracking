@@ -22,6 +22,9 @@ class CalendarAdapter(
     private lateinit var context: Context
     private val dates = mutableListOf<Date>()
 
+    private var selectedMonth: Int = -1
+    private var selectedYear: Int = -1
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CalendarViewHolder {
         context = parent.context // Context 저장
         val view = LayoutInflater.from(context)
@@ -39,18 +42,18 @@ class CalendarAdapter(
 
     override fun onBindViewHolder(holder: CalendarViewHolder, position: Int) {
         val date = days[position]
-        holder.bind(date, dateFormat)
-
-
+        holder.bind(date, dateFormat, selectedMonth, selectedYear)
     }
 
     override fun getItemCount(): Int {
         return days.size
     }
 
-    fun updateDays(newDays: List<Date>) {
+    fun updateDays(newDays: List<Date>, month: Int, year: Int) {
         days.clear()
         days.addAll(newDays)
+        selectedMonth = month
+        selectedYear = year
         notifyDataSetChanged()
     }
 
@@ -69,7 +72,7 @@ class CalendarAdapter(
             }
         }
 
-        fun bind(date: Date, dateFormat: SimpleDateFormat) {
+        fun bind(date: Date, dateFormat: SimpleDateFormat, selectedMonth: Int, selectedYear: Int) {
             currentDate = date
             dayTextView.text = dateFormat.format(date)
 
@@ -88,13 +91,10 @@ class CalendarAdapter(
                 dayOfWeek == Calendar.SATURDAY -> dayTextView.setTextColor(lightBlue) // 토요일 연파랑
                 else -> dayTextView.setTextColor(Color.BLACK) // 평일 검정색
             }
-            // 현재 월에 속하지 않는 날짜 투명도 조정
-            val currentCalendar = Calendar.getInstance()
-            currentCalendar.time = Date() // 현재 날짜
-            val isCurrentMonth = calendar.get(Calendar.MONTH) == currentCalendar.get(Calendar.MONTH)
 
-            dayTextView.alpha = if (isCurrentMonth) 1.0f else 0.4f // 현재 월인 경우 불투명, 아닌 경우 투명도 20%
+            // 현재 월에 속하지 않는 날짜 투명도 조정
+            val isCurrentMonth = calendar.get(Calendar.MONTH) == selectedMonth && calendar.get(Calendar.YEAR) == selectedYear
+            dayTextView.alpha = if (isCurrentMonth) 1.0f else 0.4f // 현재 월인 경우 불투명, 아닌 경우 투명도 40%
         }
     }
 }
-
