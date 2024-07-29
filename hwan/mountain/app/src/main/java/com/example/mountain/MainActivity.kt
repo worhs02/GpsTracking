@@ -7,13 +7,15 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var bottomNavigationView: BottomNavigationView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         loadFragment(HomeFragment()) // 기본 프래그먼트를 로드합니다.
 
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             var selectedFragment: Fragment? = null
             when (item.itemId) {
@@ -35,6 +37,16 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+    }
+
+    fun setCalendarFragmentWithDate(selectedDate: String) {
+        bottomNavigationView.selectedItemId = R.id.nav_calendar
+        val calendarFragment = CalendarFragment().apply {
+            arguments = Bundle().apply {
+                putString("selectedDate", selectedDate)
+            }
+        }
+        loadFragment(calendarFragment)
     }
 
     private fun loadFragment(fragment: Fragment) {

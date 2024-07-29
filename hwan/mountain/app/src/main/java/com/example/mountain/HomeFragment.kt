@@ -6,9 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CalendarView
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeFragment : Fragment() {
 
@@ -27,7 +26,7 @@ class HomeFragment : Fragment() {
         val settingsButton = view.findViewById<ImageButton>(R.id.settings_button)
         settingsButton.setOnClickListener {
             val settingsFragment = SettingsFragment()
-            val transaction: FragmentTransaction = parentFragmentManager.beginTransaction()
+            val transaction = parentFragmentManager.beginTransaction()
             transaction.replace(R.id.fragment_container, settingsFragment)
             transaction.addToBackStack(null)
             transaction.commit()
@@ -37,15 +36,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun showCalendarFragment(selectedDate: String) {
-        val calendarFragment = CalendarFragment().apply {
-            arguments = Bundle().apply {
-                putString("selectedDate", selectedDate)
-            }
-        }
-
-        val transaction: FragmentTransaction = parentFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragment_container, calendarFragment)
-        transaction.addToBackStack(null)
-        transaction.commit()
+        val activity = activity as MainActivity
+        activity.setCalendarFragmentWithDate(selectedDate)
     }
 }
