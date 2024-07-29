@@ -137,7 +137,7 @@ class CalendarFragment : Fragment() {
     }
 
     private fun updateCalendar() {
-        val dateFormat = SimpleDateFormat("MMMM", Locale("ko", "KR"))
+        val dateFormat = SimpleDateFormat("MMMM yyyy", Locale("ko", "KR"))
         monthTextView.text = dateFormat.format(calendar.time)
 
         updateWeekdayHeader()
@@ -170,7 +170,9 @@ class CalendarFragment : Fragment() {
             }
         }
 
-        calendarAdapter.updateDays(days)
+        val selectedMonth = calendar.get(Calendar.MONTH)
+        val selectedYear = calendar.get(Calendar.YEAR)
+        calendarAdapter.updateDays(days, selectedMonth, selectedYear)
 
         calendarRecyclerView.post {
             calendarRecyclerView.viewTreeObserver.addOnGlobalLayoutListener(object :
@@ -193,6 +195,7 @@ class CalendarFragment : Fragment() {
             })
         }
     }
+
 
 
     private fun Date.toDateString(): String {

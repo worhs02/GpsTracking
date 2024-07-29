@@ -1,10 +1,29 @@
-
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/dayTextView"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="100dp"
-    android:textSize="16sp"
-    android:background="?android:attr/selectableItemBackground"
-    android:gravity="center_horizontal"
-    android:color="@color/Light_gray"
-    />
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/dayTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:background="?android:attr/selectableItemBackground"
+        android:gravity="center_horizontal"
+        android:textColor="@color/Light_gray"
+        android:padding="3dp"/>
+
+    <TextView
+        android:id="@+id/scheduleTextView"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_weight="1"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:textColor="@android:color/black"
+
+        />
+
+</LinearLayout>
