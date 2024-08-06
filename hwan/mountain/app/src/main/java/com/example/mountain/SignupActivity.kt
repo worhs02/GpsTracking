@@ -1,13 +1,12 @@
 package com.example.mountain
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -27,14 +26,18 @@ class SignupActivity : AppCompatActivity() {
     private lateinit var btnNext: Button
     private lateinit var btnSignup: Button
     private var currentStep = 1
-    private  lateinit var backButton:ImageButton
+    private lateinit var backButton: ImageButton
 
     private lateinit var dot1: TextView
     private lateinit var dot2: TextView
     private lateinit var dot3: TextView
     private lateinit var dot4: TextView
 
+    private lateinit var emailFragment: EmailFragment
+    private lateinit var passwordFragment: PasswordFragment
+    private lateinit var usernameFragment: UsernameFragment
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signup)
@@ -49,16 +52,18 @@ class SignupActivity : AppCompatActivity() {
         dot3 = findViewById(R.id.dot3)
         dot4 = findViewById(R.id.dot4)
 
-
+        // Initialize fragments
+        emailFragment = EmailFragment()
+        passwordFragment = PasswordFragment()
+        usernameFragment = UsernameFragment()
 
         // Show the initial fragment
-        showFragment(EmailFragment())
+        showFragment(emailFragment)
 
         btnNext.setOnClickListener {
             when (currentStep) {
                 1 -> {
-                    val emailFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as? EmailFragment
-                    if (emailFragment?.getEmail()?.isNotEmpty() == true) {
+                    if (emailFragment.getEmail().isNotEmpty()) {
                         // 이메일 인증 메소드 보내기
                         emailFragment.changeVerifyState()
                         updateProgress(2)
@@ -67,23 +72,29 @@ class SignupActivity : AppCompatActivity() {
                     }
                 }
                 2 -> {
-                    val emailFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as? EmailFragment
-                    if (emailFragment?.getVerificationCode()?.isNotEmpty() == true) { // 확인코드 확인
-                        showFragment(PasswordFragment()) // This seems redundant; you might need to handle differently
+                    if (emailFragment.getVerificationCode().isNotEmpty()) { // 확인코드 확인
+                        showFragment(passwordFragment)
                         updateProgress(3)
                     } else {
                         Toast.makeText(this, "인증 코드가 틀렸습니다.", Toast.LENGTH_SHORT).show()
                     }
                 }
                 3 -> {
-                    val passwordFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as? PasswordFragment
-                    val password = passwordFragment?.getPassword()
-                    val confirmPassword = passwordFragment?.getConfirmPassword()
+                    if (passwordFragment.getPassword().isNotEmpty()) {
+                        passwordFragment.changeConfirmTextState()
+                        updateProgress(4)
+                    } else {
+                        Toast.makeText(this, "비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                4 -> {
+                    val confirmPassword = passwordFragment.getConfirmPassword()
+                    val password = passwordFragment.getPassword()
 
                     if (!password.isNullOrEmpty() && !confirmPassword.isNullOrEmpty()) {
                         if (password == confirmPassword) {
-                            showFragment(UsernameFragment())
-                            updateProgress(4)
+                            showFragment(usernameFragment)
+                            updateProgress(5)
                         } else {
                             Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
                         }
@@ -95,19 +106,12 @@ class SignupActivity : AppCompatActivity() {
         }
 
         btnSignup.setOnClickListener {
-            val usernameFragment =
-                supportFragmentManager.findFragmentById(R.id.fragment_container) as? UsernameFragment
-            val emailFragment =
-                supportFragmentManager.findFragmentById(R.id.fragment_container) as? EmailFragment
-            val passwordFragment =
-                supportFragmentManager.findFragmentById(R.id.fragment_container) as? PasswordFragment
+            val email = emailFragment.getEmail()
+            val password = passwordFragment.getPassword()
+            val confirmPassword = passwordFragment.getConfirmPassword()
+            val username = usernameFragment.getUsername()
 
-            val email = emailFragment?.getEmail() ?: ""
-            val password = passwordFragment?.getPassword() ?: ""
-            val confirmPassword = passwordFragment?.getConfirmPassword() ?: ""
-            val username = usernameFragment?.getUsername() ?: ""
-
-            if (username.isEmpty()) {
+            if (username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show()
             } else {
                 Log.d("SignupActivity", "Signup initiated")
@@ -123,7 +127,7 @@ class SignupActivity : AppCompatActivity() {
                             if (response.isSuccessful) {
                                 Log.d("SignupActivity", "Signup successful: ${response.body()}")
                                 fetchAllUsers() // 성공적으로 등록된 후 사용자 목록을 조회
-                                updateProgress(5)
+                                updateProgress(6)
                             } else {
                                 val errorBody = response.errorBody()?.string() ?: "Unknown error"
                                 Log.d("SignupActivity", "Signup failed: $errorBody")
@@ -144,11 +148,10 @@ class SignupActivity : AppCompatActivity() {
                             ).show()
                         }
                     })
-                updateProgress(5)
             }
         }
 
-            backButton.setOnClickListener{
+        backButton.setOnClickListener {
             when (currentStep) {
                 1 -> {
                     val intent = Intent(this, LoginActivity::class.java)
@@ -156,23 +159,24 @@ class SignupActivity : AppCompatActivity() {
                     finish()
                 }
                 2 -> {
-                    val emailFragment = EmailFragment()
                     showFragment(emailFragment)
                     updateProgress(1)
                 }
                 3 -> {
-                    val emailFragment = EmailFragment()
                     showFragment(emailFragment)
+                    emailFragment.changeVerifyState()
                     updateProgress(2)
                 }
                 4 -> {
-                    val passwordFragment = PasswordFragment()
                     showFragment(passwordFragment)
                     updateProgress(3)
                 }
+                5 -> {
+                    showFragment(passwordFragment)
+                    updateProgress(4)
+                }
             }
         }
-
     }
 
     private fun showFragment(fragment: Fragment) {
@@ -184,7 +188,6 @@ class SignupActivity : AppCompatActivity() {
     fun updateProgress(step: Int) {
         currentStep = step
         updateDots(step)
-
 
         when (step) {
             1 -> {
@@ -204,16 +207,21 @@ class SignupActivity : AppCompatActivity() {
             }
             4 -> {
                 btnNext.text = "다음"
+                btnNext.visibility = View.VISIBLE
+                btnSignup.visibility = View.GONE
+            }
+            5 -> {
                 btnNext.visibility = View.GONE
                 btnSignup.visibility = View.VISIBLE
             }
-            5 -> {
+            6 -> {
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
                 finish()
             }
         }
     }
+
     private fun updateDots(step: Int) {
         val activeDrawable = R.drawable.dot_active
         val inactiveDrawable = R.drawable.dot_inactive
@@ -223,6 +231,7 @@ class SignupActivity : AppCompatActivity() {
         dot3.setBackgroundResource(if (step >= 3) activeDrawable else inactiveDrawable)
         dot4.setBackgroundResource(if (step >= 4) activeDrawable else inactiveDrawable)
     }
+
     // 사용자 목록을 조회하는 메서드
     private fun fetchAllUsers() {
         RetrofitClient.apiService.getAllUsers().enqueue(object : Callback<List<DataResponse>> {
@@ -243,4 +252,3 @@ class SignupActivity : AppCompatActivity() {
         })
     }
 }
-
