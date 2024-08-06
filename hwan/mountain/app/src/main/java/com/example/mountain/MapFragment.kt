@@ -63,6 +63,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         startButton.setOnClickListener {
             if (startButton.drawable.constantState == resources.getDrawable(R.drawable.ic_play).constantState) {
                 startExercise()
+            } else if (startButton.drawable.constantState == resources.getDrawable(R.drawable.ic_pause).constantState) {
+                showStopButton()
             } else {
                 stopExercise()
             }
@@ -82,7 +84,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun startExercise() {
-        startButton.setImageResource(R.drawable.ic_stop)  // 멈춤 버튼 아이콘으로 변경
+        startButton.setImageResource(R.drawable.ic_pause)  // 일시정지 버튼 아이콘으로 변경
         timeElapsed = 0
 
         timer = Timer()
@@ -102,6 +104,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }, 1000, 1000)
+    }
+
+    private fun showStopButton() {
+        startButton.setImageResource(R.drawable.ic_stop)  // 정지 버튼 아이콘으로 변경
     }
 
     private fun stopExercise() {
