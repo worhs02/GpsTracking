@@ -54,7 +54,12 @@
             android:layout_height="16dp"
             android:layout_margin="8dp"
             android:background="@drawable/dot_inactive" />
-        \
+        <TextView
+            android:id="@+id/dot5"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/dot_inactive" />
 
     </LinearLayout>
 
