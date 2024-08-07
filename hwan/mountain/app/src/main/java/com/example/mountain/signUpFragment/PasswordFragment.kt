@@ -42,4 +42,19 @@ class PasswordFragment : Fragment() {
             repasswordField.visibility = View.VISIBLE
         }
     }
+    fun changerepassStateVisible() {
+        // Ensure `verifyCode` is initialized before using it
+        if (::repasswordField.isInitialized) {
+            repasswordText.visibility = View.VISIBLE
+            repasswordField.visibility = View.VISIBLE
+        }
+    }
+    fun changerepassStateGone() {
+        // Ensure `verifyCode` is initialized before using it
+        if (::repasswordField.isInitialized) {
+            repasswordText.visibility = View.GONE
+            repasswordField.visibility = View.GONE
+            repasswordField.text.clear()
+        }
+    }
 }

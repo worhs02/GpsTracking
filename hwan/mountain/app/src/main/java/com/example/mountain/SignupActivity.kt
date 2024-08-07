@@ -11,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.example.mountain.DataModel.DataResponse
 import com.example.mountain.DataModel.SignUpDataRequest
 import com.example.mountain.Server.RetrofitClient
@@ -32,10 +33,11 @@ class SignupActivity : AppCompatActivity() {
     private lateinit var dot2: TextView
     private lateinit var dot3: TextView
     private lateinit var dot4: TextView
+    private lateinit var dot5: TextView
 
-    private lateinit var emailFragment: EmailFragment
-    private lateinit var passwordFragment: PasswordFragment
-    private lateinit var usernameFragment: UsernameFragment
+//    private lateinit var emailFragment: EmailFragment
+//    private lateinit var passwordFragment: PasswordFragment
+//    private lateinit var usernameFragment: UsernameFragment
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,49 +53,59 @@ class SignupActivity : AppCompatActivity() {
         dot2 = findViewById(R.id.dot2)
         dot3 = findViewById(R.id.dot3)
         dot4 = findViewById(R.id.dot4)
+        dot5 = findViewById(R.id.dot5)
 
-        // Initialize fragments
-        emailFragment = EmailFragment()
-        passwordFragment = PasswordFragment()
-        usernameFragment = UsernameFragment()
+//        // Initialize fragments
+//        emailFragment = EmailFragment()
+//        passwordFragment = PasswordFragment()
+//        usernameFragment = UsernameFragment()
+
+
+
+        val EmailFragment = supportFragmentManager.findFragmentByTag("EmailFragment") as? EmailFragment
+            ?: EmailFragment()
+        val PasswordFragment = supportFragmentManager.findFragmentByTag("PasswordFragment") as? PasswordFragment
+            ?: PasswordFragment()
+        val UsernameFragment = supportFragmentManager.findFragmentByTag("UsernameFragment") as? UsernameFragment
+            ?: UsernameFragment()
 
         // Show the initial fragment
-        showFragment(emailFragment)
+        showFragment(EmailFragment,"EmailFragment")
 
         btnNext.setOnClickListener {
             when (currentStep) {
                 1 -> {
-                    if (emailFragment.getEmail().isNotEmpty()) {
+                    if (EmailFragment.getEmail().isNotEmpty()) {
                         // 이메일 인증 메소드 보내기
-                        emailFragment.changeVerifyState()
+                        EmailFragment.changeVerifyStateVisible()
                         updateProgress(2)
                     } else {
                         Toast.makeText(this, "이메일을 입력해주세요.", Toast.LENGTH_SHORT).show()
                     }
                 }
                 2 -> {
-                    if (emailFragment.getVerificationCode().isNotEmpty()) { // 확인코드 확인
-                        showFragment(passwordFragment)
+                    if (EmailFragment.getVerificationCode().isNotEmpty()) { // 확인코드 확인
+                        showFragment(PasswordFragment, "PasswordFragment")
                         updateProgress(3)
                     } else {
                         Toast.makeText(this, "인증 코드가 틀렸습니다.", Toast.LENGTH_SHORT).show()
                     }
                 }
                 3 -> {
-                    if (passwordFragment.getPassword().isNotEmpty()) {
-                        passwordFragment.changeConfirmTextState()
+                    if (PasswordFragment.getPassword().isNotEmpty()) {
+                        PasswordFragment.changeConfirmTextState()
                         updateProgress(4)
                     } else {
                         Toast.makeText(this, "비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
                     }
                 }
                 4 -> {
-                    val confirmPassword = passwordFragment.getConfirmPassword()
-                    val password = passwordFragment.getPassword()
+                    val confirmPassword = PasswordFragment.getConfirmPassword()
+                    val password = PasswordFragment.getPassword()
 
                     if (!password.isNullOrEmpty() && !confirmPassword.isNullOrEmpty()) {
                         if (password == confirmPassword) {
-                            showFragment(usernameFragment)
+                            showFragment(UsernameFragment, "UsernameFragment")
                             updateProgress(5)
                         } else {
                             Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
@@ -106,10 +118,10 @@ class SignupActivity : AppCompatActivity() {
         }
 
         btnSignup.setOnClickListener {
-            val email = emailFragment.getEmail()
-            val password = passwordFragment.getPassword()
-            val confirmPassword = passwordFragment.getConfirmPassword()
-            val username = usernameFragment.getUsername()
+            val email = EmailFragment.getEmail()
+            val password = PasswordFragment.getPassword()
+            val confirmPassword = PasswordFragment.getConfirmPassword()
+            val username = UsernameFragment.getUsername()
 
             if (username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show()
@@ -159,33 +171,62 @@ class SignupActivity : AppCompatActivity() {
                     finish()
                 }
                 2 -> {
-                    showFragment(emailFragment)
+                    showFragment(EmailFragment(), "EmailFragment")
+                    EmailFragment.changeVerifyStateGone()
                     updateProgress(1)
                 }
                 3 -> {
-                    showFragment(emailFragment)
-                    emailFragment.changeVerifyState()
+                    showFragment(EmailFragment(), "EmailFragment")
+                    EmailFragment.changeVerifyStateVisible()
                     updateProgress(2)
                 }
                 4 -> {
-                    showFragment(passwordFragment)
+                    showFragment(PasswordFragment(), "PasswordFragment")
+                    PasswordFragment.changerepassStateGone()
                     updateProgress(3)
                 }
                 5 -> {
-                    showFragment(passwordFragment)
+                    showFragment(PasswordFragment(), "PasswordFragment")
+                    PasswordFragment.changerepassStateVisible()
                     updateProgress(4)
                 }
             }
         }
+
+
+
     }
 
-    private fun showFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .commit()
+    private fun showFragment(fragment: Fragment, tag: String) {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+        // Check if the fragment is already added
+        val existingFragment = fragmentManager.findFragmentByTag(tag)
+        if (existingFragment == null) {
+            // If the fragment is not already added, add it
+            fragmentTransaction.add(R.id.fragment_container, fragment, tag)
+        } else {
+            // If the fragment is already added, show it
+            fragmentTransaction.show(existingFragment)
+        }
+
+        // Hide other fragments
+        for (frag in fragmentManager.fragments) {
+            if (frag != existingFragment) {
+                fragmentTransaction.hide(frag)
+            }
+        }
+
+        fragmentTransaction.commit()
     }
+
+
+
 
     fun updateProgress(step: Int) {
+
+        Log.d("SignupActivity", "updateProgress called with step: $step") // 로그 추가
         currentStep = step
         updateDots(step)
 
@@ -194,8 +235,11 @@ class SignupActivity : AppCompatActivity() {
                 btnNext.text = "인증하기"
                 btnNext.visibility = View.VISIBLE
                 btnSignup.visibility = View.GONE
+
             }
             2 -> {
+                Log.d("SignupActivity", "Current step: $step") // 로그 추가
+                Toast.makeText(this, "Current step: $step", Toast.LENGTH_SHORT).show()
                 btnNext.text = "인증 코드 확인"
                 btnNext.visibility = View.VISIBLE
                 btnSignup.visibility = View.GONE
@@ -222,6 +266,8 @@ class SignupActivity : AppCompatActivity() {
         }
     }
 
+
+
     private fun updateDots(step: Int) {
         val activeDrawable = R.drawable.dot_active
         val inactiveDrawable = R.drawable.dot_inactive
@@ -230,6 +276,7 @@ class SignupActivity : AppCompatActivity() {
         dot2.setBackgroundResource(if (step >= 2) activeDrawable else inactiveDrawable)
         dot3.setBackgroundResource(if (step >= 3) activeDrawable else inactiveDrawable)
         dot4.setBackgroundResource(if (step >= 4) activeDrawable else inactiveDrawable)
+        dot5.setBackgroundResource(if (step >= 5) activeDrawable else inactiveDrawable)
     }
 
     // 사용자 목록을 조회하는 메서드
@@ -251,4 +298,5 @@ class SignupActivity : AppCompatActivity() {
             }
         })
     }
+
 }

@@ -49,10 +49,17 @@ class EmailFragment : Fragment() {
         return verifyCode.text.toString() ?: ""
     }
 
-    fun changeVerifyState() {
+    fun changeVerifyStateVisible() {
         // Ensure `verifyCode` is initialized before using it
         if (::verifyCode.isInitialized) {
             verifyCode.visibility = View.VISIBLE
+        }
+    }
+    fun changeVerifyStateGone() {
+        // Ensure `verifyCode` is initialized before using it
+        if (::verifyCode.isInitialized) {
+            verifyCode.visibility = View.GONE
+            verifyCode.text.clear()
         }
     }
 }
