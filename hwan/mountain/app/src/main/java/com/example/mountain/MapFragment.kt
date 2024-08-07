@@ -106,6 +106,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }, 1000, 1000)
     }
 
+
     private fun showStopButton() {
         startButton.setImageResource(R.drawable.ic_stop)  // 정지 버튼 아이콘으로 변경
     }
