@@ -54,4 +54,8 @@ dependencies {
 
     // 지도 오버레이 구현하기 위해 필요함
     implementation("com.google.android.material:material:1.8.0")
+
+    //서버
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 }

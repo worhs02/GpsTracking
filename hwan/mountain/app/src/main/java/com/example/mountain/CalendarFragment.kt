@@ -137,7 +137,7 @@ class CalendarFragment : Fragment() {
     }
 
     private fun updateCalendar() {
-        val dateFormat = SimpleDateFormat("MMMM yyyy", Locale("ko", "KR"))
+        val dateFormat = SimpleDateFormat("MMMM", Locale("ko", "KR"))
         monthTextView.text = dateFormat.format(calendar.time)
 
         updateWeekdayHeader()
