@@ -103,7 +103,7 @@
             android:paddingTop="0dp"
             android:background="#FFFFFF"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-            android:gravity="top"> <!-- 상단 정렬 -->
+            android:gravity="top">
 
             <ImageView
                 android:id="@+id/line_image"
@@ -114,16 +114,41 @@
                 android:layout_marginTop="0dp"
                 android:layout_marginBottom="10dp" />
 
-            <ImageButton
-                android:id="@+id/start_button"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="40dp"
-                android:background="@drawable/round_button"
-                android:src="@drawable/ic_play"
-                android:layout_gravity="center"
-                android:scaleType="centerInside" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="30dp">
+
+                <ImageButton
+                    android:id="@+id/play_button"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:background="@drawable/round_button"
+                    android:src="@drawable/ic_play"
+                    android:scaleType="centerInside" />
+
+                <ImageButton
+                    android:id="@+id/pause_button"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:background="@drawable/round_button"
+                    android:src="@drawable/ic_pause"
+                    android:scaleType="centerInside"
+                    android:visibility="gone" /> <!-- 초기에는 숨김 -->
+
+                <ImageButton
+                    android:id="@+id/stop_button"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:background="@drawable/round_button"
+                    android:src="@drawable/ic_stop"
+                    android:scaleType="centerInside"
+                    android:layout_marginStart="70dp"
+                    android:visibility="gone" /> <!-- 왼쪽에 70dp 마진 추가 -->
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

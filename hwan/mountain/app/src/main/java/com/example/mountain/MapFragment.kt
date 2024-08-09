@@ -22,7 +22,9 @@ import java.util.*
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mapView: MapView
-    private lateinit var startButton: ImageButton
+    private lateinit var playButton: ImageButton
+    private lateinit var pauseButton: ImageButton
+    private lateinit var stopButton: ImageButton
     private lateinit var overlayInfo: LinearLayout
     private lateinit var exerciseTimeValue: TextView
     private lateinit var exerciseKmValue: TextView
@@ -31,6 +33,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private var timer: Timer? = null
     private var timeElapsed: Long = 0
+    private var isPaused: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,7 +49,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
 
-        startButton = view.findViewById(R.id.start_button)
+        playButton = view.findViewById(R.id.play_button)
+        pauseButton = view.findViewById(R.id.pause_button)
+        stopButton = view.findViewById(R.id.stop_button)
         overlayInfo = view.findViewById(R.id.overlay_info)
         exerciseTimeValue = view.findViewById(R.id.exercise_time_value)
         exerciseKmValue = view.findViewById(R.id.exercise_km_value)
@@ -60,14 +65,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         // 확장된 상태에서 남길 오프셋 (px 단위)
         bottomSheetBehavior.expandedOffset = 1000
 
-        startButton.setOnClickListener {
-            if (startButton.drawable.constantState == resources.getDrawable(R.drawable.ic_play).constantState) {
-                startExercise()
-            } else if (startButton.drawable.constantState == resources.getDrawable(R.drawable.ic_pause).constantState) {
-                showStopButton()
-            } else {
-                stopExercise()
-            }
+        playButton.setOnClickListener {
+            startExercise()
+        }
+
+        pauseButton.setOnClickListener {
+            pauseExercise()
+        }
+
+        stopButton.setOnClickListener {
+            stopExercise()
         }
     }
 
@@ -84,36 +91,53 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun startExercise() {
-        startButton.setImageResource(R.drawable.ic_pause)  // 일시정지 버튼 아이콘으로 변경
+        playButton.visibility = View.GONE
+        pauseButton.visibility = View.VISIBLE
+        stopButton.visibility = View.GONE  // 멈춤 버튼은 보이지 않음
+
+        isPaused = false
         timeElapsed = 0
 
         timer = Timer()
         val handler = Handler(Looper.getMainLooper())
         timer?.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
-                handler.post {
-                    timeElapsed++
-                    val hours = timeElapsed / 3600
-                    val minutes = (timeElapsed % 3600) / 60
-                    val seconds = timeElapsed % 60
-                    exerciseTimeValue.text = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+                if (!isPaused) {
+                    handler.post {
+                        timeElapsed++
+                        val hours = timeElapsed / 3600
+                        val minutes = (timeElapsed % 3600) / 60
+                        val seconds = timeElapsed % 60
+                        exerciseTimeValue.text = String.format("%02d:%02d:%02d", hours, minutes, seconds)
 
-                    // 하드코딩된 값 예시
-                    exerciseKmValue.text = String.format("%.2f", timeElapsed * 0.001)
-                    exerciseCaloriesValue.text = String.format("%.1f", timeElapsed * 0.1)
+                        // 하드코딩된 값 예시
+                        exerciseKmValue.text = String.format("%.2f", timeElapsed * 0.001)
+                        exerciseCaloriesValue.text = String.format("%.1f", timeElapsed * 0.1)
+                    }
                 }
             }
         }, 1000, 1000)
     }
 
-
-    private fun showStopButton() {
-        startButton.setImageResource(R.drawable.ic_stop)  // 정지 버튼 아이콘으로 변경
+    private fun pauseExercise() {
+        playButton.visibility = View.VISIBLE
+        pauseButton.visibility = View.GONE
+        stopButton.visibility = View.VISIBLE  // 멈춤 버튼을 보이도록 설정
+        isPaused = true
     }
 
     private fun stopExercise() {
-        startButton.setImageResource(R.drawable.ic_play)  // 플레이 버튼 아이콘으로 변경
+        playButton.visibility = View.VISIBLE
+        pauseButton.visibility = View.GONE
+        stopButton.visibility = View.GONE
         timer?.cancel()
+        isPaused = false
+
+        // 운동 상태 초기화
+        timeElapsed = 0
+        exerciseTimeValue.text = "00:00:00"
+        exerciseKmValue.text = "0.00"
+        exerciseCaloriesValue.text = "0.0"
     }
 
     override fun onStart() {
