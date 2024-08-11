@@ -31,6 +31,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_sos -> {
                     selectedFragment = SosFragment()
                 }
+                R.id.nav_setting -> {
+                    selectedFragment = SettingsFragment()
+                }
             }
             if (selectedFragment != null) {
                 loadFragment(selectedFragment)

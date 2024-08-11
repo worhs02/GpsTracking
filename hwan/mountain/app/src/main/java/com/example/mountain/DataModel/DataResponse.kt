@@ -4,5 +4,6 @@ data class DataResponse(
     val id: Int,
     val username: String,
     val email: String,
-    val passwordHash: String
+    val passwordHash: String,
+    val tag: Int,
 )

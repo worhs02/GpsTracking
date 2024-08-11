@@ -21,6 +21,7 @@ import com.example.mountain.signUpFragment.UsernameFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.random.Random
 
 class SignupActivity : AppCompatActivity() {
 
@@ -61,16 +62,18 @@ class SignupActivity : AppCompatActivity() {
 //        usernameFragment = UsernameFragment()
 
 
-
-        val EmailFragment = supportFragmentManager.findFragmentByTag("EmailFragment") as? EmailFragment
-            ?: EmailFragment()
-        val PasswordFragment = supportFragmentManager.findFragmentByTag("PasswordFragment") as? PasswordFragment
-            ?: PasswordFragment()
-        val UsernameFragment = supportFragmentManager.findFragmentByTag("UsernameFragment") as? UsernameFragment
-            ?: UsernameFragment()
+        val EmailFragment =
+            supportFragmentManager.findFragmentByTag("EmailFragment") as? EmailFragment
+                ?: EmailFragment()
+        val PasswordFragment =
+            supportFragmentManager.findFragmentByTag("PasswordFragment") as? PasswordFragment
+                ?: PasswordFragment()
+        val UsernameFragment =
+            supportFragmentManager.findFragmentByTag("UsernameFragment") as? UsernameFragment
+                ?: UsernameFragment()
 
         // Show the initial fragment
-        showFragment(EmailFragment,"EmailFragment")
+        showFragment(EmailFragment, "EmailFragment")
 
         btnNext.setOnClickListener {
             when (currentStep) {
@@ -83,6 +86,7 @@ class SignupActivity : AppCompatActivity() {
                         Toast.makeText(this, "이메일을 입력해주세요.", Toast.LENGTH_SHORT).show()
                     }
                 }
+
                 2 -> {
                     if (EmailFragment.getVerificationCode().isNotEmpty()) { // 확인코드 확인
                         showFragment(PasswordFragment, "PasswordFragment")
@@ -91,6 +95,7 @@ class SignupActivity : AppCompatActivity() {
                         Toast.makeText(this, "인증 코드가 틀렸습니다.", Toast.LENGTH_SHORT).show()
                     }
                 }
+
                 3 -> {
                     if (PasswordFragment.getPassword().isNotEmpty()) {
                         PasswordFragment.changeConfirmTextState()
@@ -99,6 +104,7 @@ class SignupActivity : AppCompatActivity() {
                         Toast.makeText(this, "비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
                     }
                 }
+
                 4 -> {
                     val confirmPassword = PasswordFragment.getConfirmPassword()
                     val password = PasswordFragment.getPassword()
@@ -108,10 +114,15 @@ class SignupActivity : AppCompatActivity() {
                             showFragment(UsernameFragment, "UsernameFragment")
                             updateProgress(5)
                         } else {
-                            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT)
+                                .show()
                         }
                     } else {
-                        Toast.makeText(this, "Please enter and confirm your password", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            "Please enter and confirm your password",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -127,9 +138,9 @@ class SignupActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show()
             } else {
                 Log.d("SignupActivity", "Signup initiated")
-                // Handle signup logic here
+
+                // Signup logic
                 val userData = SignUpDataRequest(email, password, username)
-                // 사용자 등록 API 호출
                 RetrofitClient.apiService.createUser(userData)
                     .enqueue(object : Callback<DataResponse> {
                         override fun onResponse(
@@ -138,8 +149,59 @@ class SignupActivity : AppCompatActivity() {
                         ) {
                             if (response.isSuccessful) {
                                 Log.d("SignupActivity", "Signup successful: ${response.body()}")
-                                fetchAllUsers() // 성공적으로 등록된 후 사용자 목록을 조회
-                                updateProgress(6)
+
+                                // 사용자의 ID를 가져온다
+                                val userId = response.body()?.id ?: return
+
+                                // 태그를 생성한다 (ID + 999)
+                                val tagNum = userId + 999
+
+                                // 태그 업데이트 API 호출
+                                RetrofitClient.apiService.updateTag(userId, tagNum)
+                                    .enqueue(object : Callback<DataResponse> {
+                                        override fun onResponse(
+                                            call: Call<DataResponse>,
+                                            response: Response<DataResponse>
+                                        ) {
+                                            if (response.isSuccessful) {
+                                                Log.d(
+                                                    "SignupActivity",
+                                                    "Tag number updated successfully"
+                                                )
+                                                fetchAllUsers()
+                                                updateProgress(6)
+                                            } else {
+                                                val errorBody =
+                                                    response.errorBody()?.string()
+                                                        ?: "Unknown error"
+                                                Log.d(
+                                                    "SignupActivity",
+                                                    "Tag number update failed: $errorBody"
+                                                )
+                                                Toast.makeText(
+                                                    this@SignupActivity,
+                                                    "Tag update failed: $errorBody",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        }
+
+                                        override fun onFailure(
+                                            call: Call<DataResponse>,
+                                            t: Throwable
+                                        ) {
+                                            Log.d(
+                                                "SignupActivity",
+                                                "Tag number update error: ${t.message}"
+                                            )
+                                            Toast.makeText(
+                                                this@SignupActivity,
+                                                "Error: ${t.message}",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    })
+
                             } else {
                                 val errorBody = response.errorBody()?.string() ?: "Unknown error"
                                 Log.d("SignupActivity", "Signup failed: $errorBody")
@@ -163,28 +225,33 @@ class SignupActivity : AppCompatActivity() {
             }
         }
 
-        backButton.setOnClickListener {
+
+        backButton.setOnClickListener{
             when (currentStep) {
                 1 -> {
                     val intent = Intent(this, LoginActivity::class.java)
                     startActivity(intent)
                     finish()
                 }
+
                 2 -> {
                     showFragment(EmailFragment(), "EmailFragment")
                     EmailFragment.changeVerifyStateGone()
                     updateProgress(1)
                 }
+
                 3 -> {
                     showFragment(EmailFragment(), "EmailFragment")
                     EmailFragment.changeVerifyStateVisible()
                     updateProgress(2)
                 }
+
                 4 -> {
                     showFragment(PasswordFragment(), "PasswordFragment")
                     PasswordFragment.changerepassStateGone()
                     updateProgress(3)
                 }
+
                 5 -> {
                     showFragment(PasswordFragment(), "PasswordFragment")
                     PasswordFragment.changerepassStateVisible()
@@ -192,10 +259,9 @@ class SignupActivity : AppCompatActivity() {
                 }
             }
         }
-
-
-
     }
+
+
 
     private fun showFragment(fragment: Fragment, tag: String) {
         val fragmentManager = supportFragmentManager
