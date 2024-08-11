@@ -177,4 +177,12 @@
             </LinearLayout>
         </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <!-- Fragment 교체를 위한 컨테이너 -->
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/overlay_info"
+        android:layout_above="@id/bottom_sheet" />
 </RelativeLayout>
