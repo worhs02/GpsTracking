@@ -4,6 +4,7 @@
     package="com.example.mountain">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- GPS 설정 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
