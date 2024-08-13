@@ -2,6 +2,8 @@ package com.example.mountain.Server
 
 import com.example.mountain.DataModel.UserDataResponse
 import com.example.mountain.DataModel.SignUpDataRequest
+import com.example.mountain.DataModel.RoomDataRequest
+import com.example.mountain.DataModel.RoomDataResponse
 import com.example.mountain.DataModel.UserProfileResponse
 import retrofit2.Call
 import retrofit2.http.Body
@@ -30,8 +32,19 @@ interface ApiService {
     fun createUser(@Body userData: SignUpDataRequest): Call<UserDataResponse>
 
     @PUT("users/{id}/tag")
-    fun updateTag(@Path("id") userId: Int, @Query("tagNum") tagNum: Int): Call<UserDataResponse>
+    fun updateTag(@Path("id") userId: Int, @Query("tagNum") tagNum: Int): Call<DataResponse>
+  
     @GET("/getUserProfileByEmail")
     suspend fun getUserProfileByEmail(@Query("email") email: String): UserProfileResponse
 
+  
+    // 방 관련 API
+
+    // 방 생성
+    @POST("/api/rooms")
+    fun createRoom(@Body roomData: RoomDataRequest): Call<RoomDataResponse>
+
+    // 모든 방 조회
+    @GET("/api/rooms")
+    fun getAllRooms(): Call<List<RoomDataResponse>>
 }
