@@ -3,6 +3,7 @@ package com.example.mountain
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.example.mountain.SettingMenu.ProfileFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -12,6 +13,22 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // 이메일을 Intent에서 가져오기
+        val email = intent.getStringExtra("USER_EMAIL")
+
+        // ProfileFragment에 이메일을 전달하여 프로필 로드하기
+        if (email != null) {
+            val profileFragment = ProfileFragment().apply {
+                arguments = Bundle().apply {
+                    putString("USER_EMAIL", email)
+                }
+            }
+
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, profileFragment)
+                .commit()
+        }
 
         loadFragment(HomeFragment()) // 기본 프래그먼트를 로드합니다.
 
