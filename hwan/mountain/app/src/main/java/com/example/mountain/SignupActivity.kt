@@ -11,8 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import com.example.mountain.DataModel.DataResponse
+import com.example.mountain.DataModel.UserDataResponse
 import com.example.mountain.DataModel.SignUpDataRequest
 import com.example.mountain.Server.RetrofitClient
 import com.example.mountain.signUpFragment.EmailFragment
@@ -21,7 +20,6 @@ import com.example.mountain.signUpFragment.UsernameFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import kotlin.random.Random
 
 class SignupActivity : AppCompatActivity() {
 
@@ -36,9 +34,6 @@ class SignupActivity : AppCompatActivity() {
     private lateinit var dot4: TextView
     private lateinit var dot5: TextView
 
-//    private lateinit var emailFragment: EmailFragment
-//    private lateinit var passwordFragment: PasswordFragment
-//    private lateinit var usernameFragment: UsernameFragment
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -142,10 +137,10 @@ class SignupActivity : AppCompatActivity() {
                 // Signup logic
                 val userData = SignUpDataRequest(email, password, username)
                 RetrofitClient.apiService.createUser(userData)
-                    .enqueue(object : Callback<DataResponse> {
+                    .enqueue(object : Callback<UserDataResponse> {
                         override fun onResponse(
-                            call: Call<DataResponse>,
-                            response: Response<DataResponse>
+                            call: Call<UserDataResponse>,
+                            response: Response<UserDataResponse>
                         ) {
                             if (response.isSuccessful) {
                                 Log.d("SignupActivity", "Signup successful: ${response.body()}")
@@ -158,10 +153,10 @@ class SignupActivity : AppCompatActivity() {
 
                                 // 태그 업데이트 API 호출
                                 RetrofitClient.apiService.updateTag(userId, tagNum)
-                                    .enqueue(object : Callback<DataResponse> {
+                                    .enqueue(object : Callback<UserDataResponse> {
                                         override fun onResponse(
-                                            call: Call<DataResponse>,
-                                            response: Response<DataResponse>
+                                            call: Call<UserDataResponse>,
+                                            response: Response<UserDataResponse>
                                         ) {
                                             if (response.isSuccessful) {
                                                 Log.d(
@@ -187,7 +182,7 @@ class SignupActivity : AppCompatActivity() {
                                         }
 
                                         override fun onFailure(
-                                            call: Call<DataResponse>,
+                                            call: Call<UserDataResponse>,
                                             t: Throwable
                                         ) {
                                             Log.d(
@@ -213,7 +208,7 @@ class SignupActivity : AppCompatActivity() {
                             }
                         }
 
-                        override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                        override fun onFailure(call: Call<UserDataResponse>, t: Throwable) {
                             Log.d("SignupActivity", "Signup error: ${t.message}")
                             Toast.makeText(
                                 this@SignupActivity,
@@ -347,8 +342,8 @@ class SignupActivity : AppCompatActivity() {
 
     // 사용자 목록을 조회하는 메서드
     private fun fetchAllUsers() {
-        RetrofitClient.apiService.getAllUsers().enqueue(object : Callback<List<DataResponse>> {
-            override fun onResponse(call: Call<List<DataResponse>>, response: Response<List<DataResponse>>) {
+        RetrofitClient.apiService.getAllUsers().enqueue(object : Callback<List<UserDataResponse>> {
+            override fun onResponse(call: Call<List<UserDataResponse>>, response: Response<List<UserDataResponse>>) {
                 if (response.isSuccessful) {
                     val users = response.body() ?: emptyList()
                     Log.d("SignupActivity", "Users fetched: $users")
@@ -359,7 +354,7 @@ class SignupActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<List<DataResponse>>, t: Throwable) {
+            override fun onFailure(call: Call<List<UserDataResponse>>, t: Throwable) {
                 Log.d("SignupActivity", "Error fetching users: ${t.message}")
             }
         })

@@ -40,7 +40,7 @@
                     android:src="@drawable/header_image" />
 
                 <ImageButton
-                    android:id="@+id/settings_button"
+                    android:id="@+id/profile_button"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_gravity="end|top"
@@ -48,7 +48,7 @@
                     android:background="@null"
                     android:contentDescription="Settings"
                     android:scaleType="centerInside"
-                    android:src="@drawable/ic_settings" />
+                    android:src="@drawable/ic_user" />
             </FrameLayout>
 
             <LinearLayout
