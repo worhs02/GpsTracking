@@ -32,7 +32,7 @@ interface ApiService {
     fun createUser(@Body userData: SignUpDataRequest): Call<UserDataResponse>
 
     @PUT("users/{id}/tag")
-    fun updateTag(@Path("id") userId: Int, @Query("tagNum") tagNum: Int): Call<DataResponse>
+    fun updateTag(@Path("id") userId: Int, @Query("tagNum") tagNum: Int): Call<UserDataResponse>
   
     @GET("/getUserProfileByEmail")
     suspend fun getUserProfileByEmail(@Query("email") email: String): UserProfileResponse
