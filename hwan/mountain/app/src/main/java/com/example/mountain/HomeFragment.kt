@@ -23,13 +23,8 @@ class HomeFragment : Fragment() {
             showCalendarFragment(date)
         }
 
-        val settingsButton = view.findViewById<ImageButton>(R.id.settings_button)
-        settingsButton.setOnClickListener {
-            val settingsFragment = SettingsFragment()
-            val transaction = parentFragmentManager.beginTransaction()
-            transaction.replace(R.id.fragment_container, settingsFragment)
-            transaction.addToBackStack(null)
-            transaction.commit()
+        val profileButton = view.findViewById<ImageButton>(R.id.profile_button)
+        profileButton.setOnClickListener {
         }
 
         return view

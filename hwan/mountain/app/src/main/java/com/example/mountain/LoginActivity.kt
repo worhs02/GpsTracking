@@ -34,7 +34,10 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             } else if (dbHelper.checkUser(email, password)) {
-                val intent = Intent(this, MainActivity::class.java)
+                // 로그인 성공 시 ProfileFragment로 이메일 전달
+                val intent = Intent(this, MainActivity::class.java).apply {
+                    putExtra("USER_EMAIL", email)
+                }
                 startActivity(intent)
                 finish()
             } else {
