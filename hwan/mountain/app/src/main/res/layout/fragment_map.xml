@@ -152,6 +152,16 @@
         </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+    <!-- 기본 제공되는 현위치 버튼 -->
+    <com.naver.maps.map.widget.LocationButtonView
+        android:id="@+id/location_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp" />
+
     <!-- Fragment 교체를 위한 컨테이너 -->
     <FrameLayout
         android:id="@+id/fragment_container"
