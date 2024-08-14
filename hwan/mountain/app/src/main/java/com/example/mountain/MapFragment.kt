@@ -125,6 +125,48 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    override fun onMapReady(naverMap: NaverMap) {
+        this.naverMap = naverMap
+
+        // 줌 버튼 비활성화
+        naverMap.uiSettings.isZoomControlEnabled = false
+
+        // 기본 제공되는 현위치 버튼과 NaverMap 연동
+        locationButton.map = naverMap
+
+        // 현재 위치로 이동
+        moveToCurrentLocation()
+
+        // 현재 위치를 파란색 점으로 표시
+        val locationOverlay = naverMap.locationOverlay
+        locationOverlay.isVisible = true
+
+        // 위치 추적 모드 설정 (위치를 따라 움직임)
+        naverMap.locationTrackingMode = LocationTrackingMode.Follow
+
+        // 위치 업데이트 리스너를 추가하여 위치가 변경될 때마다 파란 점의 위치를 업데이트
+        naverMap.addOnLocationChangeListener { location ->
+            locationOverlay.position = LatLng(location.latitude, location.longitude)
+        }
+    }
+
+    private fun moveToCurrentLocation() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // 권한 요청 필요
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                val currentLocation = LatLng(location.latitude, location.longitude)
+                naverMap.moveCamera(CameraUpdate.scrollTo(currentLocation))
+            } else {
+                Toast.makeText(requireContext(), "현재 위치를 가져올 수 없습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     private fun startExercise() {
         playButton.visibility = View.GONE
         pauseButton.visibility = View.VISIBLE
@@ -202,32 +244,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
-    }
-
-    override fun onMapReady(naverMap: NaverMap) {
-        this.naverMap = naverMap
-
-        // 줌 버튼 비활성화
-        naverMap.uiSettings.isZoomControlEnabled = false
-
-        // 기본 제공되는 현위치 버튼과 NaverMap 연동
-        locationButton.map = naverMap
-
-        // 청계산 입구로 기본 위치 설정
-        val cheonggyeMountainEntrance = LatLng(37.4483, 127.0565)
-        naverMap.moveCamera(CameraUpdate.scrollTo(cheonggyeMountainEntrance))
-
-        // 현재 위치를 파란색 점으로 표시
-        val locationOverlay = naverMap.locationOverlay
-        locationOverlay.isVisible = true
-
-        // 위치 추적 모드 설정 (위치를 따라 움직임)
-        naverMap.locationTrackingMode = LocationTrackingMode.Follow
-
-        // 위치 업데이트 리스너를 추가하여 위치가 변경될 때마다 파란 점의 위치를 업데이트
-        naverMap.addOnLocationChangeListener { location ->
-            locationOverlay.position = LatLng(location.latitude, location.longitude)
-        }
     }
 
     override fun onStart() {
