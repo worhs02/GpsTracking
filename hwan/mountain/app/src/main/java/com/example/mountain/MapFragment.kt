@@ -14,10 +14,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -30,6 +27,7 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.LocationTrackingMode
+
 import java.util.*
 
 class MapFragment : Fragment(), OnMapReadyCallback {
@@ -38,8 +36,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var playButton: ImageButton
     private lateinit var pauseButton: ImageButton
     private lateinit var stopButton: ImageButton
-    private lateinit var createRoomButton: View
-    private lateinit var joinRoomButton: View
     private lateinit var overlayInfo: LinearLayout
     private lateinit var exerciseTimeValue: TextView
     private lateinit var exerciseKmValue: TextView
@@ -74,8 +70,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         playButton = view.findViewById(R.id.play_button)
         pauseButton = view.findViewById(R.id.pause_button)
         stopButton = view.findViewById(R.id.stop_button)
-        createRoomButton = view.findViewById(R.id.create_room_button)
-        joinRoomButton = view.findViewById(R.id.join_room_button)
         overlayInfo = view.findViewById(R.id.overlay_info)
         exerciseTimeValue = view.findViewById(R.id.exercise_time_value)
         exerciseKmValue = view.findViewById(R.id.exercise_km_value)
@@ -127,25 +121,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             stopExercise()
             Toast.makeText(requireContext(), "운동을 종료했습니다.", Toast.LENGTH_SHORT).show()
         }
-
-        // 방 만들기 버튼 클릭 시 RoomCreateFragment로 전환
-        createRoomButton.setOnClickListener {
-            replaceFragment(RoomCreateFragment())
-        }
-
-        // 참가하기 버튼 클릭 시 RoomJoinFragment로 전환
-        joinRoomButton.setOnClickListener {
-            replaceFragment(RoomJoinFragment())
-        }
-    }
-
-    // replaceFragment 메서드를 MapFragment 클래스에 추가
-    private fun replaceFragment(fragment: Fragment) {
-        val fragmentManager: FragmentManager = parentFragmentManager
-        val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.fragment_container, fragment)
-        fragmentTransaction.addToBackStack(null)  // 뒤로 가기 가능하게 하기 위함
-        fragmentTransaction.commit()
     }
 
     private fun startExercise() {
@@ -229,6 +204,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(naverMap: NaverMap) {
         this.naverMap = naverMap
+
+        // 줌 버튼 비활성화
+        naverMap.uiSettings.isZoomControlEnabled = false
 
         // 청계산 입구로 기본 위치 설정
         val cheonggyeMountainEntrance = LatLng(37.4483, 127.0565)

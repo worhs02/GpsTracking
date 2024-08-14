@@ -8,87 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <LinearLayout
-        android:id="@+id/overlay_info"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="#FFFFFF"
-        android:padding="8dp"
-        android:layout_alignParentTop="true"
-        android:gravity="center"
-        android:weightSum="3">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_weight="1">
-
-            <TextView
-                android:id="@+id/exercise_km_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#000000"
-                android:text="0.00"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#000000"
-                android:text="킬로미터"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_weight="1">
-
-            <TextView
-                android:id="@+id/exercise_calories_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#000000"
-                android:text="0.0"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#000000"
-                android:text="칼로리"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_weight="1">
-
-            <TextView
-                android:id="@+id/exercise_time_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#000000"
-                android:text="00:00:00"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#000000"
-                android:text="시간"
-                android:textSize="12sp" />
-        </LinearLayout>
-    </LinearLayout>
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -113,6 +32,87 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="0dp"
                 android:layout_marginBottom="10dp" />
+
+            <!-- 운동 정보: 킬로미터, 칼로리, 시간 -->
+            <LinearLayout
+                android:id="@+id/overlay_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="#FFFFFF"
+                android:padding="8dp"
+                android:gravity="center"
+                android:weightSum="3">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/exercise_km_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000000"
+                        android:text="0.00"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000000"
+                        android:text="킬로미터"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/exercise_calories_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000000"
+                        android:text="0.0"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000000"
+                        android:text="칼로리"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/exercise_time_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000000"
+                        android:text="00:00:00"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000000"
+                        android:text="시간"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -149,32 +149,6 @@
                     android:layout_marginStart="70dp"
                     android:visibility="gone" /> <!-- 왼쪽에 70dp 마진 추가 -->
             </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginBottom="100dp">
-
-                <Button
-                    android:id="@+id/create_room_button"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_margin="5dp"
-                    android:backgroundTint="@color/black"
-                    android:text="방 만들기" />
-
-                <Button
-                    android:id="@+id/join_room_button"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_margin="5dp"
-                    android:backgroundTint="@color/black"
-                    android:text="참가하기" />
-            </LinearLayout>
         </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -183,6 +157,5 @@
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/overlay_info"
         android:layout_above="@id/bottom_sheet" />
 </RelativeLayout>
