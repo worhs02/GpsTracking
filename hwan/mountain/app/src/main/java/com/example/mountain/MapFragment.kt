@@ -27,7 +27,7 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.LocationTrackingMode
-
+import com.naver.maps.map.widget.LocationButtonView
 import java.util.*
 
 class MapFragment : Fragment(), OnMapReadyCallback {
@@ -41,6 +41,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var exerciseKmValue: TextView
     private lateinit var exerciseCaloriesValue: TextView
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var locationButton: LocationButtonView
 
     private var timer: Timer? = null
     private var timeElapsed: Long = 0
@@ -74,6 +75,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         exerciseTimeValue = view.findViewById(R.id.exercise_time_value)
         exerciseKmValue = view.findViewById(R.id.exercise_km_value)
         exerciseCaloriesValue = view.findViewById(R.id.exercise_calories_value)
+        locationButton = view.findViewById(R.id.location_button)
 
         val bottomSheet: LinearLayout = view.findViewById(R.id.bottom_sheet)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
@@ -207,6 +209,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         // 줌 버튼 비활성화
         naverMap.uiSettings.isZoomControlEnabled = false
+
+        // 기본 제공되는 현위치 버튼과 NaverMap 연동
+        locationButton.map = naverMap
 
         // 청계산 입구로 기본 위치 설정
         val cheonggyeMountainEntrance = LatLng(37.4483, 127.0565)
