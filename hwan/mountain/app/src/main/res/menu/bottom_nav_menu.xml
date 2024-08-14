@@ -13,9 +13,9 @@
         android:icon="@drawable/ic_calendar"
         android:title="캘린더" />
     <item
-        android:id="@+id/nav_sos"
-        android:icon="@drawable/ic_sos"
-        android:title="SOS" />
+        android:id="@+id/nav_people"
+        android:icon="@drawable/ic_people"
+        android:title="인원" />
     <item
         android:id="@+id/nav_setting"
         android:icon="@drawable/ic_settings"

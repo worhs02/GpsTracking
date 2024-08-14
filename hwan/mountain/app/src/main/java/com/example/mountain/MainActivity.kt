@@ -45,8 +45,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_calendar -> {
                     selectedFragment = CalendarFragment()
                 }
-                R.id.nav_sos -> {
-                    selectedFragment = SosFragment()
+                R.id.nav_people -> {
+                    selectedFragment = PeopleFragment()
                 }
                 R.id.nav_setting -> {
                     selectedFragment = SettingsFragment()
