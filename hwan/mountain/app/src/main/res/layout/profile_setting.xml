@@ -63,8 +63,7 @@
             android:layout_weight="1"
             android:hint="이름을 알려주세요!"
             android:textSize="18sp"
-            android:padding="8dp"
-            android:layout_marginRight=""/>
+            android:padding="8dp" />
     </LinearLayout>
 
     <!-- Nickname change field -->
