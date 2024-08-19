@@ -30,11 +30,17 @@ class LoginActivity : AppCompatActivity() {
             val password = passwordEditText.text.toString()
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "빈칸을 채워주세요.", Toast.LENGTH_SHORT).show()
+
+                //이건 서버가 안되서 임시로 로그인 버튼 누르면 넘어가도록 만든거임 - 여기부터
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
+                //이건 서버가 안되서 임시로 로그인 버튼 누르면 넘어가도록 만든거임 - 여기까지
+
             } else if (dbHelper.checkUser(email, password)) {
-                // 로그인 성공 시 ProfileFragment로 이메일 전달
+                // 로그인 성공 시 로그인 상태 저장
+                saveLoginStatus(true)
+                // 이메일을 MainActivity로 전달
                 val intent = Intent(this, MainActivity::class.java).apply {
                     putExtra("USER_EMAIL", email)
                 }
@@ -42,11 +48,6 @@ class LoginActivity : AppCompatActivity() {
                 finish()
             } else {
                 Toast.makeText(this, "이메일 또는 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show()
-
-                //화면 넘어가기 위한 임시 코드
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-                finish()
             }
         }
 
@@ -60,6 +61,15 @@ class LoginActivity : AppCompatActivity() {
 
         googleLoginButton.setOnClickListener {
             // 구글 로그인 로직 추가
+        }
+    }
+
+    // 로그인 상태를 SharedPreferences에 저장
+    private fun saveLoginStatus(isLoggedIn: Boolean) {
+        val sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            putBoolean("isLoggedIn", isLoggedIn)
+            apply()
         }
     }
 
