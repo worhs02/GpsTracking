@@ -33,6 +33,11 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    // splash 화면에서 필요함
+    viewBinding {
+        enable = true
+    }
 }
 
 dependencies {
@@ -61,4 +66,8 @@ dependencies {
 
     // GPS
     implementation ("com.google.android.gms:play-services-location:21.0.1")
+
+    // GIF 를 사용하기 위한 라이브러리
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
 }
