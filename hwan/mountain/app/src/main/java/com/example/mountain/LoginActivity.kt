@@ -7,18 +7,26 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.mountain.DataModel.LoginRequest
+import com.example.mountain.DataModel.LoginResponse
+import com.example.mountain.Server.ApiService
+import com.example.mountain.Server.RetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var dbHelper: DBHelper
+    private lateinit var apiService: ApiService // Retrofit API 서비스 인스턴스
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        dbHelper = DBHelper(this)
+        // Retrofit API 서비스 초기화
+        apiService = RetrofitClient.apiService
 
-        val emailEditText = findViewById<EditText>(R.id.email)
+        val usernameEditText = findViewById<EditText>(R.id.email)
         val passwordEditText = findViewById<EditText>(R.id.password)
         val loginButton = findViewById<Button>(R.id.login_button)
         val kakaoLoginButton = findViewById<ImageButton>(R.id.kakao_login)
@@ -26,27 +34,35 @@ class LoginActivity : AppCompatActivity() {
         val googleLoginButton = findViewById<ImageButton>(R.id.google_login)
 
         loginButton.setOnClickListener {
-            val email = emailEditText.text.toString()
+            val username = usernameEditText.text.toString()
             val password = passwordEditText.text.toString()
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "빈칸을 채워주세요.", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-                finish()
-            } else if (dbHelper.checkUser(email, password)) {
-                // 로그인 성공 시 ProfileFragment로 이메일 전달
-                val intent = Intent(this, MainActivity::class.java).apply {
-                    putExtra("USER_EMAIL", email)
-                }
-                startActivity(intent)
-                finish()
-            } else {
-                Toast.makeText(this, "이메일 또는 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show()
 
-                //화면 넘어가기 위한 임시 코드
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-                finish()
+            if (username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "빈칸을 채워주세요.", Toast.LENGTH_SHORT).show()
+            } else {
+                val loginRequest = LoginRequest(username, password)
+
+                apiService.login(loginRequest).enqueue(object : Callback<LoginResponse> {
+                    override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                        if (response.isSuccessful) {
+                            val token = response.body()?.token
+                            if (token != null) {
+                                // 로그인 성공, MainActivity로 이동
+                                val intent = Intent(this@LoginActivity, MainActivity::class.java).apply {
+                                    putExtra("USER_TOKEN", token)
+                                }
+                                startActivity(intent)
+                                finish()
+                            }
+                        } else {
+                            Toast.makeText(this@LoginActivity, "로그인 실패: ${response.message()}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                        Toast.makeText(this@LoginActivity, "로그인 실패: ${t.message}", Toast.LENGTH_SHORT).show()
+                    }
+                })
             }
         }
 

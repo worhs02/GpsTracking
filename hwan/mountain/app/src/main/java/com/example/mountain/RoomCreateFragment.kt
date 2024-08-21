@@ -38,21 +38,21 @@ class RoomCreateFragment : Fragment() {
             if (roomName.isEmpty()) {
                 Toast.makeText(requireContext(), "방 이름을 입력해주세요", Toast.LENGTH_SHORT).show()
             } else {
-                val roomData = RoomDataRequest(roomName, password)
-                RetrofitClient.apiService.createRoom(roomData).enqueue(object : Callback<RoomDataResponse> {
-                    override fun onResponse(call: Call<RoomDataResponse>, response: Response<RoomDataResponse>) {
-                        if (response.isSuccessful) {
-                            Toast.makeText(requireContext(), "방이 생성되었습니다.", Toast.LENGTH_SHORT).show()
-                            // 성공적으로 방을 생성한 후, 다음 화면으로 전환 가능
-                        } else {
-                            Toast.makeText(requireContext(), "방 생성에 실패했습니다.", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-
-                    override fun onFailure(call: Call<RoomDataResponse>, t: Throwable) {
-                        Toast.makeText(requireContext(), "서버와 통신 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
-                    }
-                })
+//                val roomData = RoomDataRequest(roomName, password)
+//                RetrofitClient.apiService.createRoom(roomData).enqueue(object : Callback<RoomDataResponse> {
+//                    override fun onResponse(call: Call<RoomDataResponse>, response: Response<RoomDataResponse>) {
+//                        if (response.isSuccessful) {
+//                            Toast.makeText(requireContext(), "방이 생성되었습니다.", Toast.LENGTH_SHORT).show()
+//                            // 성공적으로 방을 생성한 후, 다음 화면으로 전환 가능
+//                        } else {
+//                            Toast.makeText(requireContext(), "방 생성에 실패했습니다.", Toast.LENGTH_SHORT).show()
+//                        }
+//                    }
+//
+//                    override fun onFailure(call: Call<RoomDataResponse>, t: Throwable) {
+//                        Toast.makeText(requireContext(), "서버와 통신 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+//                    }
+//                })
             }
         }
 
