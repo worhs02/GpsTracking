@@ -2,12 +2,14 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 
+
 // 사용자 등록 처리
 const register = async (req, res) => {
     const { username, password, email } = req.body;
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
+        console.log('hashpPP:', hashedPassword);
         const newUser = await User.create({
             username,
             password: hashedPassword,
@@ -29,21 +31,48 @@ const register = async (req, res) => {
 
 // 사용자 로그인 처리
 const login = async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     try {
-        const user = await User.findByUsername(username);
-        if (user.length === 0 || !await bcrypt.compare(password, user[0].password)) {
-            return res.status(400).json({ message: 'Invalid username or password' });
+        // 이메일로 사용자 찾기
+        const users = await User.findByUseremail(email);
+
+
+        console.log('Users found:', users);
+
+        // 사용자가 존재하지 않으면 오류 반환
+        if (users.length === 0) {
+            return res.status(400).json({ message: 'Invalid email' });
         }
 
-        const token = jwt.sign({ id: user[0].id, username: user[0].username }, 'your_jwt_secret', { expiresIn: '1h' });
+        // 비밀번호가 일치하지 않으면 오류 반환
+        const isPasswordValid = await bcrypt.compare(password, users.password);
+        if (!isPasswordValid) {
+            console.log('informatin confirmed:', users.password);
+            return res.status(400).json({ message: 'Invalid password' });
+        }
+
+
+        // JWT 토큰 생성
+        const token = jwt.sign(
+            { id: users.id, email: users.email },
+            process.env.JWT_SECRET, // 환경 변수로 비밀 키 읽기
+            { expiresIn: '1h' }
+        );
+        console.log('Generated token:', token);
+
+        // 토큰을 응답으로 보내기
         res.json({ token });
+        console.log('Login successful');
+
     } catch (err) {
         console.error('Error during login:', err);
         res.status(500).json({ message: 'Login failed' });
     }
 };
+
+
+
 
 // 태그 업데이트 처리
 const updateTag = async (req, res) => {

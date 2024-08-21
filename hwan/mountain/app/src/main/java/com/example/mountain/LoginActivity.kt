@@ -26,7 +26,7 @@ class LoginActivity : AppCompatActivity() {
         // Retrofit API 서비스 초기화
         apiService = RetrofitClient.apiService
 
-        val usernameEditText = findViewById<EditText>(R.id.email)
+        val emailEditText = findViewById<EditText>(R.id.email)
         val passwordEditText = findViewById<EditText>(R.id.password)
         val loginButton = findViewById<Button>(R.id.login_button)
         val kakaoLoginButton = findViewById<ImageButton>(R.id.kakao_login)
@@ -34,16 +34,16 @@ class LoginActivity : AppCompatActivity() {
         val googleLoginButton = findViewById<ImageButton>(R.id.google_login)
 
         loginButton.setOnClickListener {
-            val username = usernameEditText.text.toString()
+            val email =emailEditText.text.toString()
             val password = passwordEditText.text.toString()
 
-            if (username.isEmpty() || password.isEmpty()) {
+            if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "빈칸을 채워주세요.", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this@LoginActivity, MainActivity::class.java)
                 startActivity(intent)
                 finish()
             } else {
-                val loginRequest = LoginRequest(username, password)
+                val loginRequest = LoginRequest(email, password)
 
                 apiService.login(loginRequest).enqueue(object : Callback<LoginResponse> {
                     override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
@@ -58,12 +58,12 @@ class LoginActivity : AppCompatActivity() {
                                 finish()
                             }
                         } else {
-                            Toast.makeText(this@LoginActivity, "로그인 실패: ${response.message()}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@LoginActivity, "로그인 실패1: ${response.message()}", Toast.LENGTH_SHORT).show()
                         }
                     }
 
                     override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-                        Toast.makeText(this@LoginActivity, "로그인 실패: ${t.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@LoginActivity, "로그인 실패2: ${t.message}", Toast.LENGTH_SHORT).show()
                     }
                 })
             }
