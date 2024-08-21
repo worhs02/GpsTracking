@@ -79,6 +79,15 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    // 로그인 상태를 SharedPreferences에 저장
+    private fun saveLoginStatus(isLoggedIn: Boolean) {
+        val sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            putBoolean("isLoggedIn", isLoggedIn)
+            apply()
+        }
+    }
+
     // Login 화면에서 Sign up 화면으로 넘어가는 코드
     fun openSignupActivity(view: android.view.View) {
         val intent = Intent(this, SignupActivity::class.java)
