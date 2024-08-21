@@ -24,10 +24,10 @@ interface ApiService {
     @GET("/api/users")
     fun getAllUsers(): Call<List<UserDataResponse>>
 
-    @GET("user/profile")
+    @GET("/api/user/profile")
     suspend fun getUserProfileByEmail(@Query("email") email: String): UserProfileResponse
 
-    @POST("auth/login")
+    @POST("/api/auth/login")
     fun login(@Body loginRequest: LoginRequest): Call<LoginResponse>
 
 }

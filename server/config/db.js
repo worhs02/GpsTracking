@@ -35,7 +35,7 @@ async function initializeDatabase() {
     } catch (err) {
         console.error("Error during database initialization:", err);
     } finally {
-        if (conn) conn.end(); // 연결 종료
+        if (conn) conn.release(); // 연결 종료
     }
 }
 

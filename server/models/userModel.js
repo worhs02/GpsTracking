@@ -1,8 +1,22 @@
 const db = require('../config/db');
 
+const findByUseremail = async (email) => {
+    let conn;
+    try {
+        conn = await db.getConnection(); // 커넥션 가져오기
+        await conn.query('USE GpsTracking'); // 데이터베이스 선택 확인
+        const [rows] = await conn.query('SELECT * FROM users WHERE email = ?', [email]);
+        return rows
+    } catch (err) {
+        console.error('Error querying database:', err);
+        throw err; // 에러를 호출자에게 전달
+    } finally {
+        if (conn) conn.release(); // 커넥션 반환
+    }
+};
 // 사용자 찾기
 const findByUsername = async (username) => {
-    const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
+    const [rows] = await db.query('SELECT * FROM users WHERE username= ?', [username]);
     return rows;
 };
 
@@ -27,4 +41,4 @@ const updateTag = async (userId, tagNum) => {
     await db.query('UPDATE users SET tag = ? WHERE id = ?', [tagNum, userId]);
 };
 
-module.exports = { findByUsername, create, updateTag };
+module.exports = { findByUseremail, findByUsername, create, updateTag };
