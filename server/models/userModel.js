@@ -6,11 +6,21 @@ const findByUsername = async (username) => {
     return rows;
 };
 
-// 사용자 생성
-const create = async (username, password) => {
-    const [result] = await db.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, password]);
-    return result.insertId;
-};
+async function create(user) {
+    let conn;
+    try {
+        conn = await db.getConnection(); // pool 대신 db 사용
+        await conn.query('USE GpsTracking'); // 데이터베이스 선택 확인
+        // 이메일 추가
+        const result = await conn.query('INSERT INTO users (username, password, email) VALUES (?, ?, ?)', 
+            [user.username, user.password, user.email]); // 이메일 필드 추가
+        return result;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release(); // 연결 반환 (end 대신 release 사용)
+    }
+}
 
 // 사용자 업데이트
 const updateTag = async (userId, tagNum) => {
