@@ -148,54 +148,60 @@ class SignupActivity : AppCompatActivity() {
                                 // 사용자의 ID를 가져온다
                                 val userId = response.body()?.id ?: return
 
-                                // 태그를 생성한다 (ID + 999)
-                                val tagNum = userId + 999
+                                // 회원가입 성공 후 로그인 화면으로 이동
+                                val intent = Intent(this@SignupActivity, LoginActivity::class.java)
+                                startActivity(intent)
+                                finish() // 현재 액티비티 종료
 
-                                // 태그 업데이트 API 호출
-                                RetrofitClient.apiService.updateTag(userId, tagNum)
-                                    .enqueue(object : Callback<UserDataResponse> {
-                                        override fun onResponse(
-                                            call: Call<UserDataResponse>,
-                                            response: Response<UserDataResponse>
-                                        ) {
-                                            if (response.isSuccessful) {
-                                                Log.d(
-                                                    "SignupActivity",
-                                                    "Tag number updated successfully"
-                                                )
-                                                fetchAllUsers()
-                                                updateProgress(6)
-                                            } else {
-                                                val errorBody =
-                                                    response.errorBody()?.string()
-                                                        ?: "Unknown error"
-                                                Log.d(
-                                                    "SignupActivity",
-                                                    "Tag number update failed: $errorBody"
-                                                )
-                                                Toast.makeText(
-                                                    this@SignupActivity,
-                                                    "Tag update failed: $errorBody",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            }
-                                        }
+//                                // 태그를 생성한다 (ID + 999)
+//                                val tagNum = userId + 999
+//
+//                                // 태그 업데이트 API 호출
+//                                RetrofitClient.apiService.updateTag(userId, tagNum)
+//                                    .enqueue(object : Callback<UserDataResponse> {
+//                                        override fun onResponse(
+//                                            call: Call<UserDataResponse>,
+//                                            response: Response<UserDataResponse>
+//                                        ) {
+//                                            if (response.isSuccessful) {
+//                                                Log.d(
+//                                                    "SignupActivity",
+//                                                    "Tag number updated successfully"
+//                                                )
+//                                                fetchAllUsers()
+//                                                updateProgress(6)
+//                                            } else {
+//                                                val errorBody =
+//                                                    response.errorBody()?.string()
+//                                                        ?: "Unknown error"
+//                                                Log.d(
+//                                                    "SignupActivity",
+//                                                    "Tag number update failed: $errorBody"
+//                                                )
+//                                                Toast.makeText(
+//                                                    this@SignupActivity,
+//                                                    "Tag update failed: $errorBody",
+//                                                    Toast.LENGTH_SHORT
+//                                                ).show()
+//                                            }
+//                                        }
+//
+//                                        override fun onFailure(
+//                                            call: Call<UserDataResponse>,
+//                                            t: Throwable
+//                                        ) {
+//                                            Log.d(
+//                                                "SignupActivity",
+//                                                "Tag number update error: ${t.message}"
+//                                            )
+//                                            Toast.makeText(
+//                                                this@SignupActivity,
+//                                                "Error: ${t.message}",
+//                                                Toast.LENGTH_SHORT
+//                                            ).show()
+//                                        }
+//                                    })
 
-                                        override fun onFailure(
-                                            call: Call<UserDataResponse>,
-                                            t: Throwable
-                                        ) {
-                                            Log.d(
-                                                "SignupActivity",
-                                                "Tag number update error: ${t.message}"
-                                            )
-                                            Toast.makeText(
-                                                this@SignupActivity,
-                                                "Error: ${t.message}",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
-                                    })
 
                             } else {
                                 val errorBody = response.errorBody()?.string() ?: "Unknown error"

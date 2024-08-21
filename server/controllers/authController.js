@@ -4,21 +4,28 @@ const User = require('../models/userModel');
 
 // 사용자 등록 처리
 const register = async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, email } = req.body;
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = await User.create({
             username,
-            password: hashedPassword
+            password: hashedPassword,
+            email
         });
 
-        res.status(201).json({ message: 'User created successfully', user: newUser });
+        // BigInt를 문자열로 변환
+        const userId = newUser.insertId.toString();
+
+        res.status(201).json({ message: 'User created successfully', userId });
     } catch (error) {
         console.error('Error during registration:', error);
         res.status(500).json({ message: 'Registration failed' });
     }
 };
+
+
+
 
 // 사용자 로그인 처리
 const login = async (req, res) => {
