@@ -1,6 +1,7 @@
 package com.example.mountain.Server
 
 
+import com.example.mountain.DataModel.CalendarRequest
 import com.example.mountain.DataModel.LoginRequest
 import com.example.mountain.DataModel.LoginResponse
 import com.example.mountain.DataModel.SignUpDataRequest
@@ -30,5 +31,8 @@ interface ApiService {
     @POST("/api/auth/login")
     fun login(@Body loginRequest: LoginRequest): Call<LoginResponse>
 
+    @POST("/api/auth/calendarCreate")
+    fun sendSelectedDate(@Body dateRequest: CalendarRequest): Call<Void>
 }
+
 

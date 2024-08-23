@@ -87,4 +87,27 @@ const updateTag = async (req, res) => {
     }
 };
 
+//일정 생성
+const calendarCreate = async (req, res) => {
+    const { userId, selectedDate, content } = req.body; // 생성할 필드
+
+    try {
+        // 새로운 이벤트 삽입 쿼리
+        const [result] = await pool.query(
+            `INSERT INTO events (user_id, selectedDate, content)
+             VALUES (?, ?, ?)`,
+            [userId, selectedDate,content]
+        );
+
+        // 성공적으로 삽입된 경우
+        res.status(201).json({ message: 'Event created successfully', eventId: result.insertId });
+    } catch (error) {
+        console.error('Error creating event:', error);
+        res.status(500).json({ message: 'Failed to create event' });
+    }
+};
+
+
+
+
 module.exports = { register, login, updateTag };
