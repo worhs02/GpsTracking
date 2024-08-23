@@ -13,6 +13,11 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mountain.DataModel.CalendarRequest
+import com.example.mountain.Server.RetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -234,6 +239,32 @@ class CalendarFragment : Fragment() {
         }
 
         overlayContent.startAnimation(scaleAnimation)
+        //일정 입력받기
+        val content = "Hi"
+
+        // 서버에 선택된 날짜를 전송
+        sendDateToServer(selectedDate, content)
+
+    }
+
+    private fun sendDateToServer(selectedDate: String, content: String) {
+        //user_id 가져오기
+        val user_id = 1
+        val dateRequest = CalendarRequest(user_id, selectedDate, content)
+
+        RetrofitClient.apiService.sendSelectedDate(dateRequest).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    Log.d("API", "Date sent successfully: $selectedDate")
+                } else {
+                    Log.e("API", "Failed to send date: ${response.errorBody()?.string()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Log.e("API", "Error: ${t.message}")
+            }
+        })
     }
 
     private fun hideOverlay() {
