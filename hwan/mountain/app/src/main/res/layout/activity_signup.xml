@@ -77,7 +77,8 @@
         android:layout_alignParentBottom="true"
         android:layout_marginHorizontal="16dp"
         android:text="인증하기"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
+        android:backgroundTint="@color/holo_light_green"
         />
 
     <Button
