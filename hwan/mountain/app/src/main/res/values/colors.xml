@@ -12,4 +12,5 @@
     <color name="Light_gray">#f0f3f4</color>
     <color name="light_red">#FF6F6F</color> <!-- 연빨강 -->
     <color name="light_blue">#6CC0FF</color> <!-- 연파랑 -->
+    <color name="holo_light_green">#FF99CC00</color> <!-- Holo Light Green -->
 </resources>
