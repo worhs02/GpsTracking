@@ -135,6 +135,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="확인"
+        android:textColor="@color/black"
+        android:backgroundTint="@color/holo_light_green"
         android:layout_marginTop="16dp" />
 
 </LinearLayout>
