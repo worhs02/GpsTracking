@@ -29,6 +29,7 @@ import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.widget.LocationButtonView
 import java.util.*
+import android.widget.Button
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -53,6 +54,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
     private lateinit var naverMap: NaverMap
+
+    //네이버 지도에서 기본 지도, 위성 지도, 지형 지도 추가
+    private lateinit var basicMapButton: Button
+    private lateinit var satelliteButton: Button
+    private lateinit var terrainButton: Button
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -122,6 +129,30 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         stopButton.setOnClickListener {
             stopExercise()
             Toast.makeText(requireContext(), "운동을 종료했습니다.", Toast.LENGTH_SHORT).show()
+        }
+
+
+        //네이버 지도에서 기본 지도, 위성 지도, 지형 지도 추가
+        satelliteButton = view.findViewById(R.id.satellite_button)
+        terrainButton = view.findViewById(R.id.terrain_button)
+        basicMapButton = view.findViewById(R.id.basic_map_button)
+
+        basicMapButton.setOnClickListener {
+            if (::naverMap.isInitialized) {
+                naverMap.mapType = NaverMap.MapType.Basic
+            }
+        }
+
+        satelliteButton.setOnClickListener {
+            if (::naverMap.isInitialized) {
+                naverMap.mapType = NaverMap.MapType.Satellite
+            }
+        }
+
+        terrainButton.setOnClickListener {
+            if (::naverMap.isInitialized) {
+                naverMap.mapType = NaverMap.MapType.Terrain
+            }
         }
     }
 
