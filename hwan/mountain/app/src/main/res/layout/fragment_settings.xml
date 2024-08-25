@@ -7,17 +7,6 @@
     tools:context=".SettingsFragment"
     android:padding="16dp">
 
-    <ImageButton
-        android:id="@+id/back_button"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:src="@drawable/ic_back_arrow"
-        android:background="@null"
-        android:scaleType="fitCenter"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:contentDescription="Back" />
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
