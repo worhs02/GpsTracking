@@ -51,6 +51,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private var totalDistance: Float = 0f
     private var lastLocation: Location? = null
+    private var lastAltitude: Double? = null
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
@@ -64,6 +65,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     // PolylineOverlay 및 경로 좌표 리스트
     private lateinit var polyline: PolylineOverlay
     private val pathCoordinates = ArrayList<LatLng>()
+
+    // 성인 평균 체중 설정 (남성 70kg, 여성 60kg)
+    private val maleWeight = 70f
+    private val femaleWeight = 60f
+
+    // MET 값 설정
+    private val walkingMET = 3.5
+    private val joggingMET = 7.0
+    private val runningMET = 11.0
+
+    // 경사도에 따른 MET 값 가중치
+    private val inclineWeight = 1.5
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -109,7 +122,36 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         val distance = lastLocation!!.distanceTo(location)
                         totalDistance += distance
                         exerciseKmValue.text = String.format("%.2f", totalDistance / 1000)
-                        exerciseCaloriesValue.text = String.format("%.1f", totalDistance * 0.1)
+
+                        // 고도 변화 계산
+                        val altitudeDifference = location.altitude - (lastAltitude ?: location.altitude)
+                        lastAltitude = location.altitude
+
+                        // 시간을 초 단위에서 시간 단위로 변환
+                        val elapsedTimeInHours = timeElapsed / 3600.0
+
+                        // 속도 계산 (km/h)
+                        val speed = (totalDistance / 1000) / elapsedTimeInHours
+
+                        // 경사도 계산 (고도 변화 / 거리)
+                        val incline = altitudeDifference / distance
+
+                        // MET 값 선택 (속도 및 경사도에 따라)
+                        var metValue = when {
+                            speed < 4 -> walkingMET // 걷기
+                            speed < 10 -> joggingMET // 조깅
+                            else -> runningMET // 달리기
+                        }
+
+                        // 경사도가 높은 경우 MET 값 가중치 적용
+                        if (incline > 0.05) { // 5% 이상의 경사도
+                            metValue *= inclineWeight
+                        }
+
+                        // 칼로리 계산 (남성 기준)
+                        val caloriesBurned = metValue * maleWeight * elapsedTimeInHours
+
+                        exerciseCaloriesValue.text = String.format("%.1f", caloriesBurned)
 
                         // 현재 위치를 경로에 추가하고 PolylineOverlay 갱신
                         val currentLatLng = LatLng(location.latitude, location.longitude)
@@ -119,6 +161,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     } else {
                         // 첫 위치는 경로의 시작점으로 추가
                         pathCoordinates.add(LatLng(location.latitude, location.longitude))
+                        lastAltitude = location.altitude
                     }
                     lastLocation = location
 
@@ -220,7 +263,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         isPaused = false
         lastLocation = null
+        lastAltitude = null
         totalDistance = 0f
+        timeElapsed = 0
 
         // 경로 초기화
         pathCoordinates.clear()
