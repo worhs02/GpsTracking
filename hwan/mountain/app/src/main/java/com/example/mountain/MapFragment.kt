@@ -27,6 +27,7 @@ import com.naver.maps.map.NaverMap
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.LocationTrackingMode
+import com.naver.maps.map.overlay.PolylineOverlay
 import com.naver.maps.map.widget.LocationButtonView
 import java.util.*
 import android.widget.Button
@@ -55,11 +56,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var locationCallback: LocationCallback
     private lateinit var naverMap: NaverMap
 
-    //네이버 지도에서 기본 지도, 위성 지도, 지형 지도 추가
+    // 네이버 지도에서 기본 지도, 위성 지도, 지형 지도 추가
     private lateinit var basicMapButton: Button
     private lateinit var satelliteButton: Button
     private lateinit var terrainButton: Button
 
+    // PolylineOverlay 및 경로 좌표 리스트
+    private lateinit var polyline: PolylineOverlay
+    private val pathCoordinates = ArrayList<LatLng>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -94,6 +98,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
+        // PolylineOverlay 초기화
+        polyline = PolylineOverlay()
+
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 if (isPaused) return
@@ -103,6 +110,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         totalDistance += distance
                         exerciseKmValue.text = String.format("%.2f", totalDistance / 1000)
                         exerciseCaloriesValue.text = String.format("%.1f", totalDistance * 0.1)
+
+                        // 현재 위치를 경로에 추가하고 PolylineOverlay 갱신
+                        val currentLatLng = LatLng(location.latitude, location.longitude)
+                        pathCoordinates.add(currentLatLng)
+                        polyline.coords = pathCoordinates
+                        polyline.map = naverMap
+                    } else {
+                        // 첫 위치는 경로의 시작점으로 추가
+                        pathCoordinates.add(LatLng(location.latitude, location.longitude))
                     }
                     lastLocation = location
 
@@ -131,8 +147,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             Toast.makeText(requireContext(), "운동을 종료했습니다.", Toast.LENGTH_SHORT).show()
         }
 
-
-        //네이버 지도에서 기본 지도, 위성 지도, 지형 지도 추가
+        // 네이버 지도에서 기본 지도, 위성 지도, 지형 지도 추가
         satelliteButton = view.findViewById(R.id.satellite_button)
         terrainButton = view.findViewById(R.id.terrain_button)
         basicMapButton = view.findViewById(R.id.basic_map_button)
@@ -207,6 +222,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         lastLocation = null
         totalDistance = 0f
 
+        // 경로 초기화
+        pathCoordinates.clear()
+        polyline.map = null
+
         // 타이머 시작
         if (timer != null) {
             timer?.cancel()
@@ -257,6 +276,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         exerciseTimeValue.text = "00:00:00"
         exerciseKmValue.text = "0.00"
         exerciseCaloriesValue.text = "0.0"
+
+        // 추가: 경로 초기화
+        pathCoordinates.clear()
+        polyline.map = null
     }
 
     private fun startLocationUpdates() {
