@@ -24,16 +24,10 @@ class SettingsFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
 
-        // 백 버튼 클릭 시 이전 Fragment로 돌아가기
-        val backButton = view.findViewById<ImageButton>(R.id.back_button)
         val profileLayout: LinearLayout = view.findViewById(R.id.profile_layout)
         val notificationLayout: LinearLayout = view.findViewById(R.id.notification_layout)
         val permissionLayout: LinearLayout = view.findViewById(R.id.permission_layout)
         val logoutLayout: LinearLayout = view.findViewById(R.id.logout_layout)
-
-        backButton.setOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
 
         profileLayout.setOnClickListener {
             // ProfileFragment로 전환
