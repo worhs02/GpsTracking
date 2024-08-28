@@ -89,6 +89,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginBottom="53dp"
         android:text="시작!"
-        android:textColor="@android:color/white"
+        android:backgroundTint="@color/holo_light_green"
+        android:textColor="@android:color/black"
         android:visibility="gone"/>
 </RelativeLayout>
