@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginStart="4dp"
+    android:layout_marginEnd="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    android:background="@android:color/white"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/distance_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="거리: 0.00 km"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:fontFamily="sans-serif"
+            android:paddingBottom="4dp" />
+
+        <TextView
+            android:id="@+id/calories_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="칼로리: 0 kcal"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:fontFamily="sans-serif"
+            android:paddingBottom="4dp" />
+
+        <TextView
+            android:id="@+id/time_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="시간: 00:00:00"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:fontFamily="sans-serif"
+            android:paddingBottom="4dp" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

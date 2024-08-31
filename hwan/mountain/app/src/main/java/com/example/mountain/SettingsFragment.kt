@@ -29,6 +29,15 @@ class SettingsFragment : Fragment() {
         val permissionLayout: LinearLayout = view.findViewById(R.id.permission_layout)
         val logoutLayout: LinearLayout = view.findViewById(R.id.logout_layout)
 
+        val exerciseRecordsLayout: LinearLayout = view.findViewById(R.id.exercise_records_layout)
+        exerciseRecordsLayout.setOnClickListener {
+            val exerciseRecordsFragment = ExerciseRecordsFragment()
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, exerciseRecordsFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
         profileLayout.setOnClickListener {
             // ProfileFragment로 전환
             val profileFragment = ProfileFragment() // 올바르게 생성
