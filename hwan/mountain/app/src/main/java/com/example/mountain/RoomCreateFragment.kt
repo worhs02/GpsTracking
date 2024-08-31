@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.mountain.DataModel.RoomDataRequest
@@ -29,7 +30,12 @@ class RoomCreateFragment : Fragment() {
         roomNameInput = view.findViewById(R.id.room_name)
         passwordInput = view.findViewById(R.id.password)
         val createRoomButton: Button = view.findViewById(R.id.create_room_button)
-        val cancelButton: Button = view.findViewById(R.id.cancel_button)
+        val backButton: ImageButton = view.findViewById(R.id.backButton) // 뒤로 가기 버튼
+
+        // 뒤로 가기 버튼 클릭 이벤트
+        backButton.setOnClickListener {
+            requireActivity().supportFragmentManager.popBackStack() // 이전 화면으로 돌아가기
+        }
 
         createRoomButton.setOnClickListener {
             val roomName = roomNameInput.text.toString()
@@ -38,6 +44,7 @@ class RoomCreateFragment : Fragment() {
             if (roomName.isEmpty()) {
                 Toast.makeText(requireContext(), "방 이름을 입력해주세요", Toast.LENGTH_SHORT).show()
             } else {
+                // 방 생성 로직
 //                val roomData = RoomDataRequest(roomName, password)
 //                RetrofitClient.apiService.createRoom(roomData).enqueue(object : Callback<RoomDataResponse> {
 //                    override fun onResponse(call: Call<RoomDataResponse>, response: Response<RoomDataResponse>) {
@@ -54,10 +61,6 @@ class RoomCreateFragment : Fragment() {
 //                    }
 //                })
             }
-        }
-
-        cancelButton.setOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack()
         }
 
         return view
