@@ -84,6 +84,13 @@ class SettingsFragment : Fragment() {
         }
 
         val dialog = builder.create()
+
+        // 다이얼로그가 생성된 후 버튼의 텍스트 색상 변경
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(requireContext().getColor(android.R.color.black))
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(requireContext().getColor(android.R.color.black))
+        }
+
         dialog.show()
     }
 

@@ -1,8 +1,20 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+
+    <!-- Base application theme -->
     <style name="Base.Theme.Mountain" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- 윈도우 배경 색상 -->
         <item name="android:windowBackground">@android:color/white</item>
+        <!-- 기본 툴바 색상 -->
+        <item name="colorPrimary">@android:color/white</item>
+        <!-- 상태바 색상 -->
+        <item name="colorPrimaryDark">@android:color/white</item>
+        <!-- 강조 색상 -->
+        <item name="colorAccent">@color/black</item>
     </style>
 
-    <style name="Theme.Mountain" parent="Base.Theme.Mountain" />
+    <!-- 앱 테마 확장 -->
+    <style name="Theme.Mountain" parent="Base.Theme.Mountain">
+        <!-- 여기서 추가적인 색상이나 속성을 정의할 수 있음 -->
+    </style>
+
 </resources>
