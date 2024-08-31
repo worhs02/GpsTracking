@@ -27,8 +27,8 @@ class HomeFragment : Fragment() {
 
         // 이미지 및 텍스트 데이터 설정
         val images = listOf(R.drawable.ic_panorama_1, R.drawable.ic_panorama_2)
-        val texts = listOf("2024 금산 보곡산골 산벛꽃축제 2024.4.13.(토)",
-            "2023 비단고을 산꽃축제 2023.4.15.(토)~(일)")
+        val texts = listOf("금산 보곡산골 산벛꽃축제 2024.4.13.(토)",
+            "비단고을 산꽃축제 2023.4.15.(토)~(일)")
 
         // ViewPager 어댑터 설정
         val adapter = ImageSliderAdapter(images, texts)
