@@ -76,10 +76,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="50dp"
         android:text="인증하기"
         android:textColor="@android:color/black"
-        android:backgroundTint="@color/holo_light_green"
-        />
+        android:backgroundTint="@color/holo_light_green" />
 
     <Button
         android:id="@+id/btnSignup"
@@ -87,7 +87,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="53dp"
+        android:layout_marginBottom="50dp"
         android:text="시작!"
         android:backgroundTint="@color/holo_light_green"
         android:textColor="@android:color/black"
