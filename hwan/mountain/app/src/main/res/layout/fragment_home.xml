@@ -13,9 +13,9 @@
         <!-- 프로필 버튼 추가 -->
         <ImageButton
             android:id="@+id/profile_button"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_margin="16dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_margin="15dp"
             android:background="@null"
             android:contentDescription="Settings"
             android:scaleType="centerInside"
