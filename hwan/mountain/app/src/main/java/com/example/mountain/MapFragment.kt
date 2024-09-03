@@ -329,13 +329,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
             return
         }
-        val locationRequest = LocationRequest.create().apply {
-            interval = 2000
-            fastestInterval = 1000
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        }
+
+        // 새로운 LocationRequest 빌더 사용
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 2000L)
+            .setMinUpdateIntervalMillis(1000L)
+            .build()
+
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
     }
+
 
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
