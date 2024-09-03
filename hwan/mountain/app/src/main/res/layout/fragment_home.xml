@@ -40,10 +40,12 @@
         <!-- CircleIndicator3 -->
         <me.relex.circleindicator.CircleIndicator3
             android:id="@+id/circle_indicator"
-            android:layout_width="80dp"
-            android:layout_height="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            app:ci_drawable="@drawable/dot_active"
+            app:ci_drawable_unselected="@drawable/dot_inactive" />
 
         <!-- SOS 버튼과 방 만들기 버튼을 수평 중앙에 배치 -->
         <LinearLayout
