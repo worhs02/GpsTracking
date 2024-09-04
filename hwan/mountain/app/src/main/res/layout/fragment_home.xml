@@ -9,32 +9,43 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center"> <!-- 이 속성을 추가하여 모든 자식 요소를 수직 중앙에 배치 -->
+        android:gravity="center">
 
-        <!-- 프로필 버튼 추가 -->
-        <ImageButton
-            android:id="@+id/profile_button"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_margin="15dp"
-            android:background="@null"
-            android:contentDescription="Settings"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_user"
-            android:layout_gravity="end"/>
-
-        <!-- ViewPager2와 CircleIndicator3 추가 -->
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/view_pager"
+        <!-- ViewPager2와 프로필 버튼을 포함할 FrameLayout -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="150dp"/>
+            android:layout_height="150dp"
+            android:layout_marginTop="16dp">
+
+            <!-- ViewPager2 -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <!-- 프로필 버튼 -->
+            <ImageButton
+                android:id="@+id/profile_button"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_margin="15dp"
+                android:background="@null"
+                android:contentDescription="Settings"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_user"
+                android:layout_gravity="top|end" />
+
+        </FrameLayout>
 
         <!-- CircleIndicator3 -->
         <me.relex.circleindicator.CircleIndicator3
             android:id="@+id/circle_indicator"
-            android:layout_width="80dp"
-            android:layout_height="10dp"
-            android:layout_gravity="center" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            app:ci_drawable="@drawable/dot_active"
+            app:ci_drawable_unselected="@drawable/dot_inactive" />
 
         <!-- SOS 버튼과 방 만들기 버튼을 수평 중앙에 배치 -->
         <LinearLayout
@@ -42,7 +53,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="16dp"
-            android:layout_gravity="center_horizontal"> <!-- 중앙 정렬을 위해 layout_gravity 속성 추가 -->
+            android:layout_gravity="center_horizontal">
 
             <Button
                 android:id="@+id/sos_button"

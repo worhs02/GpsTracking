@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SettingsFragment"
-    android:padding="16dp">
+    android:padding="10dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -146,7 +146,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/logout_layout"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="35dp"
             android:background="@drawable/button_background"
             android:clickable="true"
             android:gravity="center_vertical"
@@ -167,10 +167,5 @@
                 android:textColor="@android:color/black"
                 android:textSize="18sp" />
         </LinearLayout>
-
-
-
-
-
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
@@ -20,6 +21,7 @@ class RoomCreateFragment : Fragment() {
 
     private lateinit var roomNameInput: EditText
     private lateinit var passwordInput: EditText
+    private lateinit var enablePasswordCheckbox: CheckBox
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,12 +31,19 @@ class RoomCreateFragment : Fragment() {
 
         roomNameInput = view.findViewById(R.id.room_name)
         passwordInput = view.findViewById(R.id.password)
+        enablePasswordCheckbox = view.findViewById(R.id.enable_password_checkbox)
         val createRoomButton: Button = view.findViewById(R.id.create_room_button)
         val backButton: ImageButton = view.findViewById(R.id.backButton) // 뒤로 가기 버튼
 
         // 뒤로 가기 버튼 클릭 이벤트
         backButton.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack() // 이전 화면으로 돌아가기
+        }
+
+        // 체크박스 상태에 따라 비밀번호 입력 활성화/비활성화
+        enablePasswordCheckbox.setOnCheckedChangeListener { _, isChecked ->
+            passwordInput.isEnabled = isChecked
+            passwordInput.alpha = if (isChecked) 1.0f else 0.5f
         }
 
         createRoomButton.setOnClickListener {

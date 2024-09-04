@@ -40,6 +40,13 @@ class HomeFragment : Fragment() {
         // 어댑터에 데이터 변경 감지 설정
         adapter.registerAdapterDataObserver(indicator.adapterDataObserver)
 
+        // CircleIndicator3의 데이터가 ViewPager 어댑터의 데이터와 일치하는지 확인
+        if (adapter.itemCount > 0) {
+            indicator.visibility = View.VISIBLE
+        } else {
+            indicator.visibility = View.GONE
+        }
+
         val calendarView = view.findViewById<CalendarView>(R.id.calendar_view)
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
             val date = "$year-${month + 1}-$dayOfMonth"
@@ -79,3 +86,4 @@ class HomeFragment : Fragment() {
         activity.setCalendarFragmentWithDate(selectedDate)
     }
 }
+
