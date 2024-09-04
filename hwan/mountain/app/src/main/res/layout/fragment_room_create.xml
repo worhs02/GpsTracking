@@ -46,6 +46,21 @@
             android:buttonTint="@android:color/black" /> <!-- 체크박스 색상을 검정으로 설정 -->
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="75dp"
+        android:layout_marginTop="20dp">
+
+        <EditText
+            android:id="@+id/max_participants"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:hint="최대 인원 수 입력"
+            android:inputType="number" />
+    </LinearLayout>
+
     <Button
         android:id="@+id/create_room_button"
         android:layout_width="250dp"
