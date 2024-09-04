@@ -1,8 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp">
+
+    <!-- Back button -->
+    <ImageButton
+        android:id="@+id/back_button"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_back_arrow"
+        android:background="@null"
+        android:scaleType="fitCenter"
+        android:contentDescription="Back" />
 
     <!-- 방 이름 -->
     <TextView
@@ -29,17 +40,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp" />
-
-
-    <!-- 방 나가기 버튼 -->
-    <Button
-        android:id="@+id/leave_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="뒤로 가기"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@android:color/holo_green_light"
-        android:textColor="@android:color/black" />
 
 </LinearLayout>
