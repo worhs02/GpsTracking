@@ -82,7 +82,7 @@ class PeopleFragment : Fragment() {
         }
         layout.addView(titleTextView)
 
-        // 비밀번호 입력 필드 생성 jdghfdfl;kjsdf;lksj
+        // 비밀번호 입력 필드 생성
         val passwordEditText = EditText(context).apply {
             hint = "비밀번호 입력"
             setPadding(30, 20, 30, 20)
