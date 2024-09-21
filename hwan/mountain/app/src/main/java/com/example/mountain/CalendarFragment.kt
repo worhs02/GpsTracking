@@ -1,25 +1,39 @@
 package com.example.mountain
 
+import android.app.AlertDialog
+import android.content.ContentValues
 import android.graphics.Rect
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.view.*
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
+import android.widget.Button
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mountain.DataModel.CalendarRequest
 import com.example.mountain.Server.RetrofitClient
+import com.google.firebase.events.Event
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+import android.database.Cursor
+import androidx.core.content.ContentProviderCompat
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.recyclerview.widget.LinearLayoutManager
+
 
 class CalendarFragment : Fragment() {
 
@@ -29,6 +43,9 @@ class CalendarFragment : Fragment() {
     private lateinit var overlayContent: RelativeLayout
     private lateinit var selectedDateTextView: TextView
     private lateinit var weekdayHeader: LinearLayout
+    private lateinit var addEventButton: Button
+    private lateinit var databaseHelper: DatabaseHelper
+    private lateinit var eventAdapter: EventAdapter
 
     private val calendarAdapter = CalendarAdapter(
         onDateClickListener = { date, view -> showOverlay(date, view) },
@@ -50,12 +67,16 @@ class CalendarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        databaseHelper = DatabaseHelper(requireContext())
+        eventAdapter = EventAdapter()
+
         calendarRecyclerView = view.findViewById(R.id.calendarRecyclerView)
         monthTextView = view.findViewById(R.id.monthTextView)
         overlay = view.findViewById(R.id.overlay)
         overlayContent = view.findViewById(R.id.overlayContent)
         selectedDateTextView = view.findViewById(R.id.selectedDateTextView)
         weekdayHeader = view.findViewById(R.id.weekdayHeader)
+        addEventButton = view.findViewById(R.id.addEventButton)
 
         calendarRecyclerView.layoutManager = GridLayoutManager(context, 7)
         calendarRecyclerView.adapter = calendarAdapter
@@ -70,6 +91,18 @@ class CalendarFragment : Fragment() {
         overlay.setOnClickListener {
             hideOverlay()
         }
+
+        // RecyclerView 초기화
+        eventAdapter = EventAdapter()
+        val eventRecyclerView = view.findViewById<RecyclerView>(R.id.eventRecyclerView)
+        eventRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        eventRecyclerView.adapter = eventAdapter
+
+        addEventButton.setOnClickListener {
+            val selectedDate = selectedDateTextView.text.toString() // 오버레이에서 선택된 날짜 가져오기
+            addEventButtonTapped(selectedDate)
+        }
+
 
         // GestureDetector 초기화
         gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
@@ -117,6 +150,8 @@ class CalendarFragment : Fragment() {
                 }
                 return false
             }
+
+
 
         })
 
@@ -218,9 +253,9 @@ class CalendarFragment : Fragment() {
     }
 
     private fun showOverlay(date: Date, view: View) {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale("ko", "KR"))
+        val dateFormat = SimpleDateFormat("yyyy. MM. dd", Locale("ko", "KR"))
         val selectedDate = dateFormat.format(date)
-        selectedDateTextView.text = "Selected Date: $selectedDate"
+        selectedDateTextView.text = "$selectedDate"
 
         val rect = Rect()
         view.getGlobalVisibleRect(rect)
@@ -239,12 +274,9 @@ class CalendarFragment : Fragment() {
         }
 
         overlayContent.startAnimation(scaleAnimation)
-        //일정 입력받기
-        val content = "Hi"
 
-        // 서버에 선택된 날짜를 전송
-        sendDateToServer(selectedDate, content)
-
+        // 이벤트 목록 업데이트
+        updateEventsInOverlay(selectedDate)
     }
 
     private fun sendDateToServer(selectedDate: String, content: String) {
@@ -287,5 +319,71 @@ class CalendarFragment : Fragment() {
         }
 
         overlayContent.startAnimation(scaleAnimation)
+    }
+    fun addEventButtonTapped(selectedDate: String) {
+        val eventTitleInput = EditText(requireContext()) // 올바른 컨텍스트 사용
+        val dialog = AlertDialog.Builder(requireContext())// Context 변경
+            .setTitle("이벤트 추가")
+            .setMessage("이벤트 이름을 입력하세요:")
+            .setView(eventTitleInput)
+            .setPositiveButton("추가") { dialogInterface, _ ->
+                val eventTitle = eventTitleInput.text.toString().trim()
+                if (eventTitle.isNotEmpty()) {
+                    saveEventToDatabase(selectedDate, eventTitle)
+                    updateEventsInOverlay(selectedDate)
+                } else {
+                    Toast.makeText(requireContext(), "이벤트 제목은 비어있을 수 없습니다", Toast.LENGTH_SHORT).show()
+
+                }
+                dialogInterface.dismiss()
+            }
+            .setNegativeButton("취소") { dialogInterface, _ -> dialogInterface.dismiss() }
+            .create()
+
+        dialog.show()
+    }
+
+
+    private fun saveEventToDatabase(date: String, title: String) {
+        // 데이터베이스 작업을 위한 스레드 또는 Coroutine 사용
+        val event = com.example.mountain.dataClass.Event(date, title) // Event 데이터 클래스 생성
+        val db = databaseHelper.writableDatabase // 데이터베이스 열기
+
+        // 이벤트를 데이터베이스에 삽입
+        val contentValues = ContentValues().apply {
+            put("date", event.date) // 날짜
+            put("title", event.title) // 제목
+        }
+
+        db.insert("events", null, contentValues) // 이벤트 삽입
+        db.close() // 데이터베이스 닫기
+    }
+
+
+    private fun updateEventsInOverlay(date: String) {
+        val db = databaseHelper.readableDatabase // 데이터베이스 열기
+        val cursor = db.query(
+            "events", // 테이블 이름
+            arrayOf("title"), // 가져올 컬럼
+            "date = ?", // 조건
+            arrayOf(date), // 조건의 값
+            null, null, null // 그룹화, 정렬
+        )
+
+        val eventsList = mutableListOf<String>()
+        while (cursor.moveToNext()) {
+            val title = cursor.getString(0) // 제목 가져오기
+            eventsList.add(title) // 리스트에 추가
+        }
+        cursor.close() // 커서 닫기
+        db.close() // 데이터베이스 닫기
+
+        // RecyclerView 업데이트
+        updateRecyclerView(eventsList)
+    }
+
+    private fun updateRecyclerView(eventsList: List<String>) {
+        // RecyclerView 어댑터에 데이터 업데이트
+        eventAdapter.updateEvents(eventsList)
     }
 }
