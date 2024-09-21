@@ -16,18 +16,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.naver.maps.map.MapView
-import com.naver.maps.map.OnMapReadyCallback
-import com.naver.maps.map.NaverMap
-import com.naver.maps.map.CameraUpdate
+import com.naver.maps.map.*
 import com.naver.maps.geometry.LatLng
-import com.naver.maps.map.LocationTrackingMode
+import com.naver.maps.map.overlay.PolylineOverlay
 import com.naver.maps.map.widget.LocationButtonView
 import java.util.*
 import android.widget.Button
@@ -54,25 +47,41 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var timer: Timer? = null
     private var timeElapsed: Long = 0
     private var isPaused: Boolean = false
+    private var isStarted: Boolean = false  // 운동이 시작되었는지 여부를 나타내는 플래그
 
     private var totalDistance: Float = 0f
     private var lastLocation: Location? = null
+    private var lastAltitude: Double? = null
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
     private lateinit var naverMap: NaverMap
 
-    //네이버 지도에서 기본 지도, 위성 지도, 지형 지도 추가
+    // 지도 타입 버튼들
     private lateinit var basicMapButton: Button
     private lateinit var satelliteButton: Button
     private lateinit var terrainButton: Button
 
+    // PolylineOverlay 및 경로 좌표 리스트
+    private lateinit var polyline: PolylineOverlay
+    private val pathCoordinates = ArrayList<LatLng>()
+
+    // 성인 평균 체중 (남성, 여성)
+    private val maleWeight = 70f
+    private val femaleWeight = 60f
+
+    // MET 값
+    private val walkingMET = 3.5
+    private val joggingMET = 7.0
+    private val runningMET = 11.0
+
+    // 경사도에 따른 MET 값 가중치
+    private val inclineWeight = 1.5
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // 레이아웃 인플레이트
         return inflater.inflate(R.layout.fragment_map, container, false)
     }
 
@@ -93,13 +102,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val bottomSheet: LinearLayout = view.findViewById(R.id.bottom_sheet)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-
-        // 초기 상태에서 보이는 높이 설정 (px 단위)
         bottomSheetBehavior.peekHeight = 300
-        // 확장된 상태에서 남길 오프셋 (px 단위)
         bottomSheetBehavior.expandedOffset = 1000
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+
+        polyline = PolylineOverlay()
+        polyline.color = resources.getColor(android.R.color.holo_green_light, null) // Polyline 색상 녹색으로 설정
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
@@ -107,17 +116,48 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 for (location in locationResult.locations) {
                     if (lastLocation != null) {
                         val distance = lastLocation!!.distanceTo(location)
-                        totalDistance += distance
-                        exerciseKmValue.text = String.format("%.2f", totalDistance / 1000)
-                        exerciseCaloriesValue.text = String.format("%.1f", totalDistance * 0.1)
+                        if (distance > 1) { // 거리가 1미터 이상인 경우에만 계산
+                            totalDistance += distance
+                            exerciseKmValue.text = String.format("%.2f", totalDistance / 1000)
+
+                            val altitudeDifference = location.altitude - (lastAltitude ?: location.altitude)
+                            lastAltitude = location.altitude
+
+                            val elapsedTimeInHours = timeElapsed / 3600.0
+                            val speed = (totalDistance / 1000) / elapsedTimeInHours
+                            val incline = altitudeDifference / distance
+
+                            var metValue = when {
+                                speed < 4 -> walkingMET
+                                speed < 10 -> joggingMET
+                                else -> runningMET
+                            }
+
+                            if (incline > 0.05) {
+                                metValue *= inclineWeight
+                            }
+
+                            // 칼로리 계산 (남성 기준, 사용자 맞춤 설정 가능)
+                            val caloriesBurned = metValue * maleWeight * elapsedTimeInHours
+                            exerciseCaloriesValue.text = String.format("%.1f", caloriesBurned)
+
+                            val currentLatLng = LatLng(location.latitude, location.longitude)
+                            pathCoordinates.add(currentLatLng)
+                            polyline.coords = pathCoordinates
+                            polyline.map = naverMap
+                        }
+                    } else {
+                        // 처음 위치 설정
+                        pathCoordinates.add(LatLng(location.latitude, location.longitude))
+                        lastAltitude = location.altitude
                     }
                     lastLocation = location
 
-                    // 파란 점 위치 업데이트
+                    // 위치 오버레이 업데이트
                     if (::naverMap.isInitialized) {
                         val locationOverlay = naverMap.locationOverlay
                         locationOverlay.position = LatLng(location.latitude, location.longitude)
-                        naverMap.moveCamera(CameraUpdate.scrollTo(locationOverlay.position))
+                        locationOverlay.bearing = location.bearing
                     }
                     //userId가져오는 코드로 변경
                     val userId = 2
@@ -162,8 +202,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             Toast.makeText(requireContext(), "운동을 종료했습니다.", Toast.LENGTH_SHORT).show()
         }
 
-
-        //네이버 지도에서 기본 지도, 위성 지도, 지형 지도 추가
         satelliteButton = view.findViewById(R.id.satellite_button)
         terrainButton = view.findViewById(R.id.terrain_button)
         basicMapButton = view.findViewById(R.id.basic_map_button)
@@ -189,32 +227,26 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(naverMap: NaverMap) {
         this.naverMap = naverMap
-
-        // 줌 버튼 비활성화
         naverMap.uiSettings.isZoomControlEnabled = false
+        locationButton.map = naverMap // LocationButtonView와 NaverMap 연결
 
-        // 기본 제공되는 현위치 버튼과 NaverMap 연동
-        locationButton.map = naverMap
-
-        // 현재 위치로 이동
-        moveToCurrentLocation()
-
-        // 현재 위치를 파란색 점으로 표시
+        // 위치 오버레이를 통해 파란 점을 현재 위치에 표시
         val locationOverlay = naverMap.locationOverlay
         locationOverlay.isVisible = true
 
-        // 위치 추적 모드 설정 (위치를 따라 움직임)
-        naverMap.locationTrackingMode = LocationTrackingMode.Follow
+        // 위치 추적 모드를 None으로 설정하여 자동으로 카메라가 이동하지 않도록 설정
+        naverMap.locationTrackingMode = LocationTrackingMode.None
 
-        // 위치 업데이트 리스너를 추가하여 위치가 변경될 때마다 파란 점의 위치를 업데이트
-        naverMap.addOnLocationChangeListener { location ->
-            locationOverlay.position = LatLng(location.latitude, location.longitude)
+        // 위치 버튼 클릭 시 현재 위치로 이동
+        locationButton.setOnClickListener {
+            moveToCurrentLocation()
         }
+
+        moveToCurrentLocation()
     }
 
     private fun moveToCurrentLocation() {
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // 권한 요청 필요
             ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
             return
         }
@@ -230,42 +262,58 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun startExercise() {
-        playButton.visibility = View.GONE
-        pauseButton.visibility = View.VISIBLE
-        stopButton.visibility = View.GONE  // 멈춤 버튼은 보이지 않음
+        if (!isStarted) {
+            // 운동이 처음 시작되는 경우에만 초기화
+            playButton.visibility = View.GONE
+            pauseButton.visibility = View.VISIBLE
+            stopButton.visibility = View.GONE
 
-        isPaused = false
-        lastLocation = null
-        totalDistance = 0f
+            isPaused = false
+            isStarted = true
+            lastLocation = null
+            lastAltitude = null
+            totalDistance = 0f
+            timeElapsed = 0
 
-        // 타이머 시작
-        if (timer != null) {
-            timer?.cancel()
-        }
+            pathCoordinates.clear()
+            polyline.map = null
 
-        timer = Timer()
-        val handler = Handler(Looper.getMainLooper())
-        timer?.scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
-                if (!isPaused) {
-                    handler.post {
-                        timeElapsed++
-                        val hours = timeElapsed / 3600
-                        val minutes = (timeElapsed % 3600) / 60
-                        val seconds = timeElapsed % 60
-                        exerciseTimeValue.text = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+            if (timer != null) {
+                timer?.cancel()
+            }
+
+            timer = Timer()
+            val handler = Handler(Looper.getMainLooper())
+            timer?.scheduleAtFixedRate(object : TimerTask() {
+                override fun run() {
+                    if (!isPaused) {
+                        handler.post {
+                            timeElapsed++
+                            val hours = timeElapsed / 3600
+                            val minutes = (timeElapsed % 3600) / 60
+                            val seconds = timeElapsed % 60
+                            exerciseTimeValue.text = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+                        }
                     }
                 }
-            }
-        }, 1000, 1000)
+            }, 1000, 1000)
 
-        startLocationUpdates()
+            startLocationUpdates()
+        } else if (isPaused) {
+            // 운동이 일시 정지 후 재개될 때
+            playButton.visibility = View.GONE
+            pauseButton.visibility = View.VISIBLE
+            stopButton.visibility = View.GONE
+
+            isPaused = false
+            startLocationUpdates()
+        }
     }
 
     private fun pauseExercise() {
         playButton.visibility = View.VISIBLE
         pauseButton.visibility = View.GONE
-        stopButton.visibility = View.VISIBLE  // 멈춤 버튼을 보이도록 설정
+        stopButton.visibility = View.VISIBLE
         isPaused = true
         stopLocationUpdates()
     }
@@ -275,24 +323,40 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         pauseButton.visibility = View.GONE
         stopButton.visibility = View.GONE
 
-        // 타이머 종료 및 초기화
         timer?.cancel()
         timer = null
 
         isPaused = false
+        isStarted = false  // 운동이 종료됨을 표시
         stopLocationUpdates()
 
-        // 운동 상태 초기화
+        saveExerciseRecord() // 운동 데이터 저장
+
         timeElapsed = 0
         totalDistance = 0f
         exerciseTimeValue.text = "00:00:00"
         exerciseKmValue.text = "0.00"
         exerciseCaloriesValue.text = "0.0"
+
+        pathCoordinates.clear()
+        polyline.map = null
+    }
+
+    private fun saveExerciseRecord() {
+        // 운동 데이터 저장 로직
+        val exerciseRecord = ExerciseRecord(
+            distance = totalDistance / 1000,
+            calories = exerciseCaloriesValue.text.toString().toFloat(),
+            time = exerciseTimeValue.text.toString(),
+            path = pathCoordinates
+        )
+
+        // 운동 기록을 SharedPreferences, 데이터베이스, 또는 정적 리스트에 저장
+        ExerciseRecordRepository.saveRecord(exerciseRecord)
     }
 
     private fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // 권한 요청 필요
             ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
             return
         }
@@ -304,6 +368,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
     }
+
 
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)

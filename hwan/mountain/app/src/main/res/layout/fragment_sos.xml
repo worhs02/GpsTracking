@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
+    <!-- 뒤로 가기 버튼 추가 -->
+    <ImageButton
+        android:id="@+id/backButton"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_back_arrow"
+        android:background="@null"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:scaleType="fitCenter"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp" />
+
+    <!-- 헬리콥터 이미지 -->
     <ImageView
         android:id="@+id/helicopterImage"
         android:layout_width="400dp"
@@ -15,6 +30,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="50dp"/>
 
+    <!-- 위치 텍스트 -->
     <TextView
         android:id="@+id/locationText"
         android:layout_width="wrap_content"
@@ -27,7 +43,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="100dp" />
 
-
+    <!-- 119 전화 버튼 -->
     <Button
         android:id="@+id/call119Button"
         android:layout_width="270dp"

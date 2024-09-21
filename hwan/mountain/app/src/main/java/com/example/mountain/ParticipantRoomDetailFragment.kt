@@ -4,16 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.ImageButton
+import android.widget.ListView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 
 class ParticipantRoomDetailFragment : Fragment() {
 
     private lateinit var roomName: TextView
     private lateinit var participantsList: ListView
-    private lateinit var chatInput: EditText
-    private lateinit var sendButton: Button
-    private lateinit var leaveRoomButton: Button
+    private lateinit var backButton: ImageButton
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,7 +26,7 @@ class ParticipantRoomDetailFragment : Fragment() {
         // UI 요소 초기화
         roomName = view.findViewById(R.id.room_name)
         participantsList = view.findViewById(R.id.participants_list)
-        leaveRoomButton = view.findViewById(R.id.leave_button)
+        backButton = view.findViewById(R.id.back_button) // 뒤로가기 이미지 버튼
 
         // 방 이름 설정 (전달된 데이터 사용)
         val roomNameText = arguments?.getString(ARG_ROOM_NAME) ?: "Default Room"
@@ -35,9 +37,8 @@ class ParticipantRoomDetailFragment : Fragment() {
         val participantsAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, participants)
         participantsList.adapter = participantsAdapter
 
-
-        // 나가기 버튼 클릭 리스너 설정
-        leaveRoomButton.setOnClickListener {
+        // 뒤로가기 버튼 클릭 리스너 설정
+        backButton.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
         }
 

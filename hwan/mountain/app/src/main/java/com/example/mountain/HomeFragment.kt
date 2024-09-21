@@ -8,14 +8,44 @@ import android.widget.Button
 import android.widget.CalendarView
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
+import androidx.viewpager2.widget.ViewPager2
+import me.relex.circleindicator.CircleIndicator3
 
 class HomeFragment : Fragment() {
+
+    private lateinit var viewPager: ViewPager2
+    private lateinit var indicator: CircleIndicator3
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
+
+        viewPager = view.findViewById(R.id.view_pager)
+        indicator = view.findViewById(R.id.circle_indicator)
+
+        // 이미지 및 텍스트 데이터 설정
+        val images = listOf(R.drawable.ic_panorama_1, R.drawable.ic_panorama_2)
+        val texts = listOf("금산 보곡산골 산벛꽃축제 2024.4.13.(토)",
+            "비단고을 산꽃축제 2023.4.15.(토)~(일)")
+
+        // ViewPager 어댑터 설정
+        val adapter = ImageSliderAdapter(images, texts)
+        viewPager.adapter = adapter
+
+        // Indicator를 ViewPager와 연결
+        indicator.setViewPager(viewPager)
+
+        // 어댑터에 데이터 변경 감지 설정
+        adapter.registerAdapterDataObserver(indicator.adapterDataObserver)
+
+        // CircleIndicator3의 데이터가 ViewPager 어댑터의 데이터와 일치하는지 확인
+        if (adapter.itemCount > 0) {
+            indicator.visibility = View.VISIBLE
+        } else {
+            indicator.visibility = View.GONE
+        }
 
         val calendarView = view.findViewById<CalendarView>(R.id.calendar_view)
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
@@ -38,6 +68,16 @@ class HomeFragment : Fragment() {
                 .commit()
         }
 
+        val createRoomButton = view.findViewById<Button>(R.id.create_room_button)
+        createRoomButton.setOnClickListener {
+            // 방 만들기 버튼 클릭 시 RoomCreateFragment로 이동
+            val roomCreateFragment = RoomCreateFragment()
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, roomCreateFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
         return view
     }
 
@@ -46,3 +86,4 @@ class HomeFragment : Fragment() {
         activity.setCalendarFragmentWithDate(selectedDate)
     }
 }
+
