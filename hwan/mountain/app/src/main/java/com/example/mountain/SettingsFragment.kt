@@ -24,15 +24,18 @@ class SettingsFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
 
-        // 백 버튼 클릭 시 이전 Fragment로 돌아가기
-        val backButton = view.findViewById<ImageButton>(R.id.back_button)
         val profileLayout: LinearLayout = view.findViewById(R.id.profile_layout)
         val notificationLayout: LinearLayout = view.findViewById(R.id.notification_layout)
         val permissionLayout: LinearLayout = view.findViewById(R.id.permission_layout)
         val logoutLayout: LinearLayout = view.findViewById(R.id.logout_layout)
 
-        backButton.setOnClickListener {
-            parentFragmentManager.popBackStack()
+        val exerciseRecordsLayout: LinearLayout = view.findViewById(R.id.exercise_records_layout)
+        exerciseRecordsLayout.setOnClickListener {
+            val exerciseRecordsFragment = ExerciseRecordsFragment()
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, exerciseRecordsFragment)
+                .addToBackStack(null)
+                .commit()
         }
 
         profileLayout.setOnClickListener {
@@ -90,6 +93,13 @@ class SettingsFragment : Fragment() {
         }
 
         val dialog = builder.create()
+
+        // 다이얼로그가 생성된 후 버튼의 텍스트 색상 변경
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(requireContext().getColor(android.R.color.black))
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(requireContext().getColor(android.R.color.black))
+        }
+
         dialog.show()
     }
 

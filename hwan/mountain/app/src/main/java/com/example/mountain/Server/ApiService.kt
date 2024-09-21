@@ -1,6 +1,5 @@
 package com.example.mountain.Server
 
-
 import com.example.mountain.DataModel.CalendarRequest
 import com.example.mountain.DataModel.LocationData
 import com.example.mountain.DataModel.LoginRequest
@@ -17,7 +16,9 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.Response
 
+
 interface ApiService {
+
     @POST("/api/auth/register")
     fun createUser(@Body userData: SignUpDataRequest): Call<UserDataResponse>
 
@@ -38,5 +39,3 @@ interface ApiService {
     @POST("/api/auth/locationUpdate")
     suspend fun updateLocation(@Body locationData: LocationData): Response<Void>
 }
-
-

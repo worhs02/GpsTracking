@@ -73,4 +73,7 @@ dependencies {
     // GIF 를 사용하기 위한 라이브러리
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
+
+    // 홈 프래그먼트의 CircleIndicator를 사용하기 위한 라이브러리
+    implementation ("me.relex:circleindicator:2.1.6")
 }

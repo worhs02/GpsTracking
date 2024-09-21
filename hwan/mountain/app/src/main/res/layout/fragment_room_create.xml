@@ -2,8 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
+
+    <ImageButton
+        android:id="@+id/backButton"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_back_arrow"
+        android:background="@null"
+        android:scaleType="fitCenter"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp" />
 
     <EditText
         android:id="@+id/room_name"
@@ -13,12 +22,44 @@
         android:layout_marginTop="100dp"
         android:layout_marginStart="75dp" />
 
-    <EditText
-        android:id="@+id/password"
-        android:layout_width="250dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="비밀번호 (선택사항)"
-        android:layout_marginStart="75dp" />
+        android:layout_marginStart="75dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="225dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="비밀번호 (선택사항)"
+            android:enabled="false"
+            android:alpha="0.5" />
+
+        <CheckBox
+            android:id="@+id/enable_password_checkbox"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="5dp"
+            android:buttonTint="@android:color/black" /> <!-- 체크박스 색상을 검정으로 설정 -->
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="75dp"
+        android:layout_marginTop="20dp">
+
+        <EditText
+            android:id="@+id/max_participants"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:hint="최대 인원 수 입력"
+            android:inputType="number" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/create_room_button"
@@ -28,16 +69,6 @@
         android:textColor="@color/black"
         android:backgroundTint="@android:color/holo_green_light"
         android:layout_marginTop="50dp"
-        android:layout_marginStart="75dp" />
-
-    <Button
-        android:id="@+id/cancel_button"
-        android:layout_width="250dp"
-        android:layout_height="40dp"
-        android:text="취소"
-        android:textColor="@color/black"
-        android:backgroundTint="@android:color/holo_green_light"
-        android:layout_marginTop="16dp"
         android:layout_marginStart="75dp" />
 
 </LinearLayout>
