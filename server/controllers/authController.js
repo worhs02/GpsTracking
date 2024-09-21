@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
+const db = require('../config/db');
+const pool = require('../config/db')
 
 
 // 사용자 등록 처리
@@ -107,7 +109,54 @@ const calendarCreate = async (req, res) => {
     }
 };
 
+// 위치 업데이트 처리
+const locationUpdate = async (req, res) => {
+    const { userId, latitude, longitude } = req.body;
+
+    // 입력 데이터 유효성 검사
+    if (typeof userId !== 'number', typeof latitude !== 'number' || typeof longitude !== 'number') {
+        return res.status(400).json({ message: 'Invalid data' });
+    }
+
+    let conn;
+
+    try {
+        conn = await pool.getConnection();
+        await conn.query('USE GpsTracking');
+    
+        // 위치 정보 삽입 쿼리
+        const query = `
+            INSERT INTO locations (userId, latitude, longitude)
+            VALUES (?, ?, ?)
+        `;
+        const result = await conn.query(query, [userId, latitude, longitude]);
+    
+        console.log('Query result:', result); // 결과 로그
+        if (result.warningStatus > 0) {
+            const [warnings] = await conn.query('SHOW WARNINGS');
+            console.log('Warnings:', warnings);
+        }
+    
+        // 결과가 배열이 아닐 경우 처리
+        if (result && result.insertId) {
+            res.status(200).json({ message: 'Location updated successfully', locationId: Number(result.insertId)});
+        } else {
+            res.status(500).json({ message: 'Failed to update location' });
+        }
+    } catch (error) {
+        console.error('Error updating location:', error);
+        res.status(500).json({ message: 'Failed to update location' });
+    } finally {
+        if (conn) {
+            await conn.release();
+        }
+    }
+    
+};
 
 
 
-module.exports = { register, login, updateTag };
+
+
+
+module.exports = { register, login, updateTag, locationUpdate };

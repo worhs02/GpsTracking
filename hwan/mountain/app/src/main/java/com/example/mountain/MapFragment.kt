@@ -6,6 +6,7 @@ import android.location.Location
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +31,12 @@ import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.widget.LocationButtonView
 import java.util.*
 import android.widget.Button
+import com.example.mountain.DataModel.LocationData
+import com.example.mountain.Server.RetrofitClient.apiService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -112,9 +119,33 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         locationOverlay.position = LatLng(location.latitude, location.longitude)
                         naverMap.moveCamera(CameraUpdate.scrollTo(locationOverlay.position))
                     }
+                    //userId가져오는 코드로 변경
+                    val userId = 2
+                    // 위치 데이터 서버에 전송
+                    //유저아이디와 타임스탬프 추가하기
+                    val locationData = LocationData(userId, location.latitude, location.longitude)
+                    Log.d("LocationData", "Latitude: ${locationData.latitude}, Longitude: ${locationData.longitude}")
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            val response = apiService.updateLocation(locationData)
+                            if (response.isSuccessful) {
+                                withContext(Dispatchers.Main) {
+                                    Log.d("LocationUpdate", "위치 업데이트 성공")
+                                }
+                            } else {
+                                withContext(Dispatchers.Main) {
+                                    Log.d("LocationUpdate", "위치 업데이트 실패: ${response.code()} ${response.message()}")
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("LocationUpdate", "네트워크 에러: ${e.message}", e)
+                        }
+                    }
+
                 }
             }
         }
+
 
         playButton.setOnClickListener {
             startExercise()
@@ -266,9 +297,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             return
         }
         val locationRequest = LocationRequest.create().apply {
-            interval = 2000
+            interval = 2000 //5분마다 실행
             fastestInterval = 1000
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+
         }
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
     }
