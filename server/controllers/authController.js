@@ -63,8 +63,11 @@ const login = async (req, res) => {
         );
         console.log('Generated token:', token);
 
+        //tag 보내기
+        const userId = users.id
+
         // 토큰을 응답으로 보내기
-        res.json({ token });
+        res.json({ token, userId });
         console.log('Login successful');
 
     } catch (err) {

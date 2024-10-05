@@ -2,6 +2,7 @@ package com.example.mountain
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -49,7 +50,12 @@ class LoginActivity : AppCompatActivity() {
                     override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                         if (response.isSuccessful) {
                             val token = response.body()?.token
+                            val tag = response.body()?.userId
                             if (token != null) {
+
+                                // 로그인 성공, MainActivity로 이동
+                                saveLoginStatus(true, tag) // 로그인 상태 저장
+
                                 // 로그인 성공, MainActivity로 이동
                                 val intent = Intent(this@LoginActivity, MainActivity::class.java).apply {
                                     putExtra("USER_TOKEN", token)
@@ -83,13 +89,22 @@ class LoginActivity : AppCompatActivity() {
     }
 
     // 로그인 상태를 SharedPreferences에 저장
-    private fun saveLoginStatus(isLoggedIn: Boolean) {
+    private fun saveLoginStatus(isLoggedIn: Boolean, userId: Int?) {
         val sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         with(sharedPreferences.edit()) {
             putBoolean("isLoggedIn", isLoggedIn)
-            apply()
+            if (userId != null) {
+                putInt("userId", userId)
+                Log.d("LoginActivity", "tag : $userId")
+            } // int 값 저장
+            else{
+                Log.d("LoginActivity","tag is Null")
+            }
+
+            apply() // 비동기로 저장
         }
     }
+
 
     // Login 화면에서 Sign up 화면으로 넘어가는 코드
     fun openSignupActivity(view: android.view.View) {
