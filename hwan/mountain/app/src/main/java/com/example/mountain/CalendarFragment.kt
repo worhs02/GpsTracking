@@ -2,6 +2,7 @@ package com.example.mountain
 
 import android.app.AlertDialog
 import android.content.ContentValues
+import android.content.Context.MODE_PRIVATE
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.InputType
@@ -30,6 +31,7 @@ import java.util.*
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.database.Cursor
+import android.graphics.Color
 import androidx.core.content.ContentProviderCompat
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -46,6 +48,8 @@ class CalendarFragment : Fragment() {
     private lateinit var addEventButton: Button
     private lateinit var databaseHelper: DatabaseHelper
     private lateinit var eventAdapter: EventAdapter
+    private var userId: Int = -1 // 전역 변수로 userId 선언
+
 
     private val calendarAdapter = CalendarAdapter(
         onDateClickListener = { date, view -> showOverlay(date, view) },
@@ -69,6 +73,15 @@ class CalendarFragment : Fragment() {
 
         databaseHelper = DatabaseHelper(requireContext())
         eventAdapter = EventAdapter()
+        // SharedPreferences에서 userId 가져오기
+        val sharedPreferences = requireContext().getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        userId = sharedPreferences.getInt("userId", -1) // userId 초기화
+
+        // userId가 유효하지 않으면 작업 중단
+        if (userId == -1) {
+            Log.e("API", "User ID not found in SharedPreferences")
+            return
+        }
 
         calendarRecyclerView = view.findViewById(R.id.calendarRecyclerView)
         monthTextView = view.findViewById(R.id.monthTextView)
@@ -105,55 +118,72 @@ class CalendarFragment : Fragment() {
 
 
         // GestureDetector 초기화
-        gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
-            private val SWIPE_THRESHOLD = 5
-            private val SWIPE_VELOCITY_THRESHOLD = 5
+        gestureDetector =
+            GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+                private val SWIPE_THRESHOLD = 5
+                private val SWIPE_VELOCITY_THRESHOLD = 5
 
-            override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-                isSwiping = true
-                return super.onScroll(e1, e2, distanceX, distanceY)
-            }
-
-            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-                if (e1 != null) {
-                    val diffX = e2.x - e1.x
-                    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                        if (diffX > 0) {
-                            onSwipeRight()
-                        } else {
-                            onSwipeLeft()
-                        }
-                        isSwiping = false
-                        return true
-                    }
+                override fun onScroll(
+                    e1: MotionEvent?,
+                    e2: MotionEvent,
+                    distanceX: Float,
+                    distanceY: Float
+                ): Boolean {
+                    isSwiping = true
+                    return super.onScroll(e1, e2, distanceX, distanceY)
                 }
-                return false
-            }
 
-            override fun onSingleTapUp(e: MotionEvent): Boolean {
-                if (!isSwiping) {
-                    e?.let {
-                        val view = calendarRecyclerView.findChildViewUnder(it.x, it.y)
-                        view?.let { clickedView ->
-                            val position = calendarRecyclerView.getChildAdapterPosition(clickedView)
-                            Log.d("CalendarFragment", "Clicked position: $position")
-                            val date = calendarAdapter.getDateAtPosition(position)
-                            if (date != null) {
-                                showOverlay(date, clickedView)
-                                Log.d("CalendarFragment", "Date clicked: ${date.toDateString()}")
+                override fun onFling(
+                    e1: MotionEvent?,
+                    e2: MotionEvent,
+                    velocityX: Float,
+                    velocityY: Float
+                ): Boolean {
+                    if (e1 != null) {
+                        val diffX = e2.x - e1.x
+                        if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                            if (diffX > 0) {
+                                onSwipeRight()
                             } else {
-                                Log.e("CalendarFragment", "Date not found at position: $position")
+                                onSwipeLeft()
+                            }
+                            isSwiping = false
+                            return true
+                        }
+                    }
+                    return false
+                }
+
+                override fun onSingleTapUp(e: MotionEvent): Boolean {
+                    if (!isSwiping) {
+                        e?.let {
+                            val view = calendarRecyclerView.findChildViewUnder(it.x, it.y)
+                            view?.let { clickedView ->
+                                val position =
+                                    calendarRecyclerView.getChildAdapterPosition(clickedView)
+                                Log.d("CalendarFragment", "Clicked position: $position")
+                                val date = calendarAdapter.getDateAtPosition(position)
+                                if (date != null) {
+                                    showOverlay(date, clickedView)
+                                    Log.d(
+                                        "CalendarFragment",
+                                        "Date clicked: ${date.toDateString()}"
+                                    )
+                                } else {
+                                    Log.e(
+                                        "CalendarFragment",
+                                        "Date not found at position: $position"
+                                    )
+                                }
                             }
                         }
+                        return true
                     }
-                    return true
+                    return false
                 }
-                return false
-            }
 
 
-
-        })
+            })
 
         view.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
@@ -190,7 +220,10 @@ class CalendarFragment : Fragment() {
         tempCalendar.add(Calendar.DAY_OF_MONTH, -firstDayOfMonth)
 
         val lastDayOfMonth = calendar.clone() as Calendar
-        lastDayOfMonth.set(Calendar.DAY_OF_MONTH, lastDayOfMonth.getActualMaximum(Calendar.DAY_OF_MONTH))
+        lastDayOfMonth.set(
+            Calendar.DAY_OF_MONTH,
+            lastDayOfMonth.getActualMaximum(Calendar.DAY_OF_MONTH)
+        )
 
         val lastDayOfWeek = lastDayOfMonth.get(Calendar.DAY_OF_WEEK) - 1
         val daysToStartOfLastWeek = -lastDayOfWeek
@@ -221,7 +254,8 @@ class CalendarFragment : Fragment() {
                     calendarRecyclerView.viewTreeObserver.removeOnGlobalLayoutListener(this)
 
                     initialDate?.let { date ->
-                        val position = days.indexOfFirst { it.toDateString() == date.toDateString() }
+                        val position =
+                            days.indexOfFirst { it.toDateString() == date.toDateString() }
                         if (position != -1) {
                             calendarRecyclerView.layoutManager?.let { layoutManager ->
                                 layoutManager.scrollToPosition(position)
@@ -235,7 +269,6 @@ class CalendarFragment : Fragment() {
             })
         }
     }
-
 
 
     private fun Date.toDateString(): String {
@@ -276,12 +309,18 @@ class CalendarFragment : Fragment() {
         overlayContent.startAnimation(scaleAnimation)
 
         // 이벤트 목록 업데이트
-        updateEventsInOverlay(selectedDate)
+        updateEventsInOverlay(selectedDate, userId)
     }
 
     private fun sendDateToServer(selectedDate: String, content: String) {
-        //user_id 가져오기
-        val user_id = 1
+
+        val sharedPreferences = requireContext().getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val user_id = sharedPreferences.getInt("userId", -1) // 기본값은 -1로 설정
+
+        if (user_id == -1) {
+            Log.e("API", "User ID not found in SharedPreferences")
+            return
+        }
         val dateRequest = CalendarRequest(user_id, selectedDate, content)
 
         RetrofitClient.apiService.sendSelectedDate(dateRequest).enqueue(object : Callback<Void> {
@@ -320,19 +359,20 @@ class CalendarFragment : Fragment() {
 
         overlayContent.startAnimation(scaleAnimation)
     }
+
     fun addEventButtonTapped(selectedDate: String) {
         val eventTitleInput = EditText(requireContext()) // 올바른 컨텍스트 사용
         val dialog = AlertDialog.Builder(requireContext())// Context 변경
-            .setTitle("이벤트 추가")
             .setMessage("이벤트 이름을 입력하세요:")
             .setView(eventTitleInput)
             .setPositiveButton("추가") { dialogInterface, _ ->
                 val eventTitle = eventTitleInput.text.toString().trim()
                 if (eventTitle.isNotEmpty()) {
                     saveEventToDatabase(selectedDate, eventTitle)
-                    updateEventsInOverlay(selectedDate)
+                    updateEventsInOverlay(selectedDate, userId)
                 } else {
-                    Toast.makeText(requireContext(), "이벤트 제목은 비어있을 수 없습니다", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "이벤트 제목은 비어있을 수 없습니다", Toast.LENGTH_SHORT)
+                        .show()
 
                 }
                 dialogInterface.dismiss()
@@ -340,33 +380,52 @@ class CalendarFragment : Fragment() {
             .setNegativeButton("취소") { dialogInterface, _ -> dialogInterface.dismiss() }
             .create()
 
+        // 다이얼로그가 보여질 때 버튼 스타일 조정
+        dialog.setOnShowListener {
+            val buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            val buttonNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+
+            // 버튼의 텍스트 색상 조정
+            buttonPositive.setTextColor(Color.BLUE) // 추가 버튼 색상 변경
+            buttonNegative.setTextColor(Color.RED) // 취소 버튼 색상 변경
+        }
+
         dialog.show()
     }
 
 
     private fun saveEventToDatabase(date: String, title: String) {
-        // 데이터베이스 작업을 위한 스레드 또는 Coroutine 사용
-        val event = com.example.mountain.dataClass.Event(date, title) // Event 데이터 클래스 생성
-        val db = databaseHelper.writableDatabase // 데이터베이스 열기
 
-        // 이벤트를 데이터베이스에 삽입
-        val contentValues = ContentValues().apply {
-            put("date", event.date) // 날짜
-            put("title", event.title) // 제목
-        }
+        if (userId != -1) {
+            // 데이터베이스 작업을 위한 스레드 또는 Coroutine 사용
+            val event =
+                com.example.mountain.dataClass.Event(userId, date, title) // Event 데이터 클래스 생성
+            val db = databaseHelper.writableDatabase // 데이터베이스 열기
 
-        db.insert("events", null, contentValues) // 이벤트 삽입
-        db.close() // 데이터베이스 닫기
+            // 이벤트를 데이터베이스에 삽입
+            val contentValues = ContentValues().apply {
+                put("tag", event.userId) // userId 저장
+                put("date", event.date) // 날짜 저장
+                put("title", event.title) // 제목 저장
+            }
+
+            db.insert("events", null, contentValues) // 이벤트 삽입
+            db.close() // 데이터베이스 닫기
+        } else
+    {
+        Log.d("CalenderFragment", "전역변수 설정 오류")
     }
+}
 
 
-    private fun updateEventsInOverlay(date: String) {
+
+    private fun updateEventsInOverlay(date: String, userId: Int) {
         val db = databaseHelper.readableDatabase // 데이터베이스 열기
         val cursor = db.query(
             "events", // 테이블 이름
             arrayOf("title"), // 가져올 컬럼
-            "date = ?", // 조건
-            arrayOf(date), // 조건의 값
+            "tag = ? AND date = ?", // 조건
+            arrayOf(userId.toString(), date), // 조건의 값
             null, null, null // 그룹화, 정렬
         )
 

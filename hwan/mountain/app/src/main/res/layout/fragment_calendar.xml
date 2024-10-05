@@ -145,7 +145,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Add Event"
-                android:layout_alignParentBottom="true" />
+                android:textColor="@android:color/black"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/button_border"
+                />
         </RelativeLayout>
     </RelativeLayout>
 

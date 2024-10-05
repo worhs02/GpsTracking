@@ -8,7 +8,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "events.db" // 데이터베이스 이름
-        private const val DATABASE_VERSION = 1 // 데이터베이스 버전
+        private const val DATABASE_VERSION = 2 // 데이터베이스 버전
         private const val TABLE_EVENTS = "events" // 테이블 이름
     }
 
@@ -16,6 +16,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     override fun onCreate(db: SQLiteDatabase) {
         val createTableQuery = ("CREATE TABLE $TABLE_EVENTS (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "tag INTEGER NOT NULL," +
                 "date TEXT NOT NULL," +
                 "title TEXT NOT NULL)")
         db.execSQL(createTableQuery)
